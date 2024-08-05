@@ -1,0 +1,8 @@
+{
+  str: 'str',
+  num: 2,
+  list: [11, 'aaa', 3],
+  obj: {
+    a: 1
+  }
+}

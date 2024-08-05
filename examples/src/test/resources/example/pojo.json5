@@ -1,0 +1,27 @@
+// Alex data
+{
+  name: 'Alex',
+  age: 5, // Probably wrong
+  address: {
+    city: 'Brussels',
+    street: 'Rue'
+  },
+  contacts: [
+    {
+      type: 'MAIL',
+      value: 'alex@example.com'
+    },
+    {
+      type: 'PHONE',
+      value: '+380123456789'
+    }
+  ],
+  /**
+   * TODO: Validate skills
+   */
+  skills: [
+    'C#',
+    'Java',
+    'Spring'
+  ]
+}

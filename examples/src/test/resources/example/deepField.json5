@@ -1,0 +1,7 @@
+{
+  address: {
+    city: '$*', // ignore value of city
+    street: 'Wrong street', // check street
+  },
+  '$*': '$*' // ignore all other fields
+}

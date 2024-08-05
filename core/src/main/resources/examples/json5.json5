@@ -1,0 +1,22 @@
+{
+  num: 2,
+  strSingleQuote: 'str\"ing',
+  strDoubleQuote: "str\"ing", //dd
+  bool: true,
+  list: [11, 'aaa', 3], // Comment
+  longStr: '\
+"aa\taa\
+bbb\nccc',
+  /* Multiline
+  Comment */
+  obj: { // Comment
+    a: 1
+  },
+  empty: null,
+  emptyList: [],
+  emptyObj: {},
+  '$*': '$*',
+  '$/asa/': 1,
+  a$_a: 1,
+  if: 1,
+}

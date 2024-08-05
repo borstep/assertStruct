@@ -1,0 +1,4 @@
+{
+  '$config.ordered': true,
+  key: 'value'
+}

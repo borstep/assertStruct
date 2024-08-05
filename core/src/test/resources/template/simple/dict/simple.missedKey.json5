@@ -1,0 +1,6 @@
+{
+  addKeyBefore: 'otherValue',
+  key: 'value',
+  addKeyAfter: 'otherValue',
+  key1: 'value1'
+}

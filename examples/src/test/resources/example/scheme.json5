@@ -1,0 +1,20 @@
+// Person simple scheme
+{
+  name: '$* ::String',
+  age: '$* ::Integer',
+  address: {
+    city: '$* ::Integer', // Error in scheme
+    street: '$* ::String'
+  },
+  contacts: [
+    {
+      type: '$/MAIL|PHONE/',
+      value: '$* ::String'
+    },
+    '$...'
+  ],
+  skills: [
+    '$* ::String',
+    '$...'
+  ]
+}

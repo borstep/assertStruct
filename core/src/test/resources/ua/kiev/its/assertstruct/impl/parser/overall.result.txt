@@ -1,0 +1,33 @@
+<// initial prefix
+<{>
+><  <slc: >><<"value">, // single line comment suffix
+><  <mlc: >><<"value">, /* multiline
+  comment suffix */
+><  <mlcWithSlcWithComa: >><<"value3"> /* field 3 suffix all the way to end of
+  line after comma ignoring multiline comments */ , // field 2 suffix
+><  <comentInField /* comment in field */: >><<"value">,
+><  <comentInFieldWithEOL /* comment in field */:
+  >><<"value">,
+><  <simple: >><<"value">,
+><  // SLC 1
+  // SLC 2
+  <prefixSLCComment: >><<"value">,
+><  /* ML Comment
+   prefix */
+  <prefixMLCComment: >><<"value">,
+><  <noComa: >><<{>
+><    <noComa: >><<"value5"> // single line comment suffix without comma
+><  <}>,
+><  <emptyArray:>><<[>><<]>,
+><  <emptyObject: >><<{>><<}>,
+><  <arr: >><<[>
+><    <"value1">,
+><    <"value3">,
+><  <]>,
+><  <obj:  >><<{>
+><    <"key1": >><<"value1">,
+><    <"key3": >><<"value3">
+><  <}>,
+><  <arrShort: >><<[>><<1>,>< <2>,>< <3>><<]>,
+><  <objShort: >><<{>><<"key1": >><<1>,>< <"key2": >><<2>,>< <"key3": >><<3>>< <}>,
+><<}>>

@@ -1,0 +1,13 @@
+{
+  num: 2,
+  strSingleQuote: 'str\"ing',
+  strDoubleQuote: "str\"ing",
+  bool: true,
+  list: [11, 'aaa', 3],
+  obj: {
+    a: 1
+  },
+  empty: null,
+  emptyList: [],
+  emptyObj: {},
+}

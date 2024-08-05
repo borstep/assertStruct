@@ -1,0 +1,21 @@
+{
+  'key': 'value',
+  $config: {
+    ordered: false,
+    ignoreUnknown: false,
+  },
+  $configSubtree: {
+    orderedDicts: true,
+    orderedLists: true,
+    ignoreUnknown: true,
+  },
+  child: {
+    'key2': 'value2',
+  },
+  childOverride: {
+    $config: {
+      ignoreUnknown: false
+    },
+    'key3': 'value3',
+  }
+}

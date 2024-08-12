@@ -1,6 +1,6 @@
-package ua.kiev.its.assertstruct.config;
+package ua.kiev.its.assertstruct.converter;
 
-public interface JsonConverterI {
+public interface JsonConverter {
 
     /**
      * Convert POJO to JSON compatible structure

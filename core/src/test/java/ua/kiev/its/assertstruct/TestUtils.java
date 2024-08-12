@@ -29,8 +29,8 @@ public class TestUtils {
     public static List listOf(Object ... values) {
         return Arrays.asList(values);
     }
-    public static void checkFail(String templatePath, String expectedPath, Object actualValue) {
-        checkFail(Res.from(templatePath), Res.from(expectedPath), actualValue);
+    public static void checkFail(String template, String expected, Object actualValue) {
+        checkFail(Res.res(template), Res.res(expected), actualValue);
     }
     public static void checkFail(Res resTemplate, Res resExpected, Object actualValue) {
         Template template = parse(resTemplate);
@@ -40,7 +40,7 @@ public class TestUtils {
     }
 
     public static void checkOK(String tempalePath, Object actualValue) {
-        checkOK(Res.from(tempalePath), actualValue);
+        checkOK(Res.res(tempalePath), actualValue);
     }
     public static void checkOK(Res res, Object actualValue) {
         Template template = res.asTemplate();

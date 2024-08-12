@@ -3,6 +3,7 @@ package ua.kiev.its.assertstruct.result;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ua.kiev.its.assertstruct.AssertStruct;
+import ua.kiev.its.assertstruct.converter.Wrapper;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.template.TemplateKey;
 import ua.kiev.its.assertstruct.template.TemplateNode;
@@ -42,6 +43,12 @@ public class Json5Printer {
     }
 
     private void print(Object value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) throws IOException {
+        if (value instanceof Wrapper) {
+            value = ((Wrapper) value).getValue();
+        }
+        if (value instanceof RootResult) {
+            value=((RootResult) value).getDelegate();
+        }
         if (value instanceof TemplateNode) {
             ((TemplateNode) value).print(out, trailingComma, trailingEOL, indent, fromNewLine);
         } else if (value instanceof Map) {

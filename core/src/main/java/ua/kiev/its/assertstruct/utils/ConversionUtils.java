@@ -35,4 +35,8 @@ public class ConversionUtils {
         }
         return value;
     }
+
+    public static boolean isSimpleJsonType(Object value) {
+        return value==null || value instanceof String || value instanceof Number || value instanceof Boolean;
+    }
 }

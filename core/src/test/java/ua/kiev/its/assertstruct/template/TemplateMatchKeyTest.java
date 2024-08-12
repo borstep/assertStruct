@@ -58,4 +58,11 @@ class TemplateMatchKeyTest {
                 ));
     }
 
+    @Test
+    void matchEmptyFail() throws IOException {
+        checkFail("{ key: 'value' }",
+                "{ }",
+                mapOf());
+    }
+
 }

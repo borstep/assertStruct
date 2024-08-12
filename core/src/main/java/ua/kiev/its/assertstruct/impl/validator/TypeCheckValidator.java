@@ -22,10 +22,11 @@ public class TypeCheckValidator implements SharedValidator {
     }
 
     @NonNull
-    Class clazz;
+    Class<?> clazz;
 
     @Override
     public boolean match(Object value, Matcher context) {
-        return value != null && clazz.isAssignableFrom(value.getClass());
+        Object sourceValue=context.getCurrentSource();
+        return sourceValue != null && clazz.isAssignableFrom(sourceValue.getClass());
     }
 }

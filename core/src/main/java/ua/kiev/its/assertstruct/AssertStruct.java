@@ -4,22 +4,25 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.opentest4j.AssertionFailedError;
 import ua.kiev.its.assertstruct.config.*;
-import ua.kiev.its.assertstruct.impl.converter.jackson.JacksonConverter;
+import ua.kiev.its.assertstruct.converter.JsonConverter;
 import ua.kiev.its.assertstruct.impl.config.ConfigParsingFactory;
 import ua.kiev.its.assertstruct.impl.config.SubtreeConfig;
+import ua.kiev.its.assertstruct.impl.converter.jackson.JacksonConverter;
 import ua.kiev.its.assertstruct.impl.factories.any.ShortAnyFactory;
 import ua.kiev.its.assertstruct.impl.factories.array.RepeaterFactory;
 import ua.kiev.its.assertstruct.impl.factories.regexp.RegexpFactory;
+import ua.kiev.its.assertstruct.impl.factories.spel.SpelFactoryRegistrar;
 import ua.kiev.its.assertstruct.impl.factories.variable.ConstantFactory;
 import ua.kiev.its.assertstruct.impl.factories.variable.DefaultConstantService;
 import ua.kiev.its.assertstruct.result.Json5Printer;
 import ua.kiev.its.assertstruct.result.MatchResult;
+import ua.kiev.its.assertstruct.result.RootResult;
 import ua.kiev.its.assertstruct.template.Template;
 import ua.kiev.its.assertstruct.utils.ResourceLocation;
 
@@ -29,25 +32,32 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.util.*;
 
-import static ua.kiev.its.assertstruct.utils.ResourceUtils.codeLocator;
+import static ua.kiev.its.assertstruct.utils.ResourceUtils.*;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AssertStruct implements ResourceSourceLocator {
 
     private static final ParsingFactory[] defaultFactories = new ParsingFactory[]{
             RepeaterFactory.INSTANCE,
             ConfigParsingFactory.INSTANCE,
             ShortAnyFactory.INSTANCE,
-            RegexpFactory.INSTANCE
+            RegexpFactory.INSTANCE,
     };
-    private static AssertStruct defaultInstance = buildDefault();
+
+    private static final ParsingFactoryRegistrar[] defaultRegistrar = new ParsingFactoryRegistrar[]{
+            SpelFactoryRegistrar.INSTANCE
+    };
+    private static final AssertStruct defaultInstance = buildDefault();
 
     @Getter
     private List<String> defaultPackages = Arrays.asList("java.lang", "java.util");
 
     static AssertStruct buildDefault() {
         AssertStruct conf = new AssertStruct();
+        for (ParsingFactoryRegistrar registrar : defaultRegistrar) {
+            registrar.registerFactory(conf);
+        }
         for (ParsingFactory factory : defaultFactories) {
             conf.registerParsingFactory(factory);
         }
@@ -92,7 +102,7 @@ public class AssertStruct implements ResourceSourceLocator {
     private String generatePath = "assert-struct";
     private boolean generate = true;
     @Getter
-    private JsonConverterI jsonConverter = new JacksonConverter();
+    private JsonConverter jsonConverter = new JacksonConverter();
 
 
     private List<ResourceLocation> targetResources = new ArrayList<>();
@@ -200,9 +210,8 @@ public class AssertStruct implements ResourceSourceLocator {
     }
 
     public void match(@NonNull Res expected, Object pojoActualValue, String message, StackTraceElement el) {
-        Object actualValue = getJsonConverter().pojo2json(pojoActualValue);
         Template template = expected.asTemplate();
-        MatchResult match = template.match(actualValue);
+        RootResult match = template.match(pojoActualValue);
         if (match.hasDifference()) {
             if (el == null) {
                 el = codeLocator();
@@ -229,7 +238,7 @@ public class AssertStruct implements ResourceSourceLocator {
             errMessage.append("Diff: ").append(expected.getSourceLocation().diff(matchLocation));
             try {
                 Json5Printer printer = new Json5Printer(this);
-                printer.print(actualValue);
+                printer.print(match.getMatchedValue());
                 try (PrintWriter out = new PrintWriter(valueFile)) {
                     out.print(printer.toString());
                 }
@@ -241,7 +250,7 @@ public class AssertStruct implements ResourceSourceLocator {
             String actualString = match.asString();
 
             errMessage.append("\nexpected: ").append(expectedString).append(" but was: ").append(actualString);
-            throw new AssertionFailedError(errMessage.toString(), expectedString, actualString);
+            throw new AssertionStructFailedError(errMessage.toString(), expectedString, actualString, match.getMatchedValue());
         }
     }
 

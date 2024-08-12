@@ -1,43 +1,100 @@
 package ua.kiev.its.assertstruct.matcher;
 
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import ua.kiev.its.assertstruct.AssertStruct;
 import ua.kiev.its.assertstruct.config.SharedValidator;
+import ua.kiev.its.assertstruct.converter.ListWrapper;
+import ua.kiev.its.assertstruct.converter.MapWrapper;
+import ua.kiev.its.assertstruct.converter.Wrapper;
 import ua.kiev.its.assertstruct.impl.config.ConfigTemplateKey;
 import ua.kiev.its.assertstruct.impl.factories.array.RepeaterTemplateNode;
-import ua.kiev.its.assertstruct.result.ErrorList;
-import ua.kiev.its.assertstruct.result.ErrorMap;
-import ua.kiev.its.assertstruct.result.ErrorValue;
-import ua.kiev.its.assertstruct.result.MatchResult;
+import ua.kiev.its.assertstruct.result.*;
 import ua.kiev.its.assertstruct.template.*;
 import ua.kiev.its.assertstruct.template.node.ArrayNode;
 import ua.kiev.its.assertstruct.template.node.ObjectNode;
 
 import java.util.*;
 
-import static ua.kiev.its.assertstruct.impl.factories.array.RepeaterTemplateNode.isRepeater;
-import static ua.kiev.its.assertstruct.utils.Markers.EOS;
+import static ua.kiev.its.assertstruct.impl.factories.array.RepeaterTemplateNode.*;
+import static ua.kiev.its.assertstruct.utils.ConversionUtils.*;
+import static ua.kiev.its.assertstruct.utils.Markers.*;
 
-@Data
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Matcher {
+    @Getter
     @Setter(value = AccessLevel.NONE)
     final AssertStruct env;
+
+    @Getter
     @Setter(value = AccessLevel.NONE)
     final Template template;
 
+    Object rootValue;
+    Object currentValue;
+    ArrayDeque<Object> parents = new ArrayDeque<>();
+    ArrayDeque<Object> keys = new ArrayDeque<>();
 
-    boolean orderedDict = false;
 
-
-    public MatchResult match(Object value) {
-        return match(value, template.getRoot());
+    public RootResult match(Object value) {
+        rootValue = currentValue = convert(value);
+        MatchResult match = match(template.getRoot());
+        return new RootResult(match, Wrapper.unwrap(rootValue));
     }
 
-    private MatchResult match(Object value, TemplateNode node) {
+    public Object getCurrentValue() {
+        return Wrapper.unwrap(currentValue);
+    }
+
+    public Object getCurrentSource() {
+        return Wrapper.source(currentValue);
+    }
+
+    private Object convert(Object value) {
+        if (isSimpleJsonType(value)) {
+            return value;
+        } else if (value instanceof Wrapper) {
+            return value;
+        } else if (value instanceof Map) {
+            return new MapWrapper((Map) value);
+        } else if (value instanceof Collection) {
+            return new ListWrapper((Collection) value);
+        } else {
+            return env.getJsonConverter().pojo2json(value);
+        }
+    }
+
+    private MatchResult matchNext(Object key, TemplateNode node) {
+        Wrapper currentWrapper = (Wrapper) currentValue;
+        Object child;
+        if (key instanceof EvaluatorTemplateKey) {
+            child = convert(((EvaluatorTemplateKey) key).evaluate(currentWrapper.getSource(), this));
+            currentWrapper.setChild(key, child);
+        } else {
+            child = currentWrapper.getChild(key);
+            Object convertedChild = convert(child);
+            if (child != convertedChild) {
+                currentWrapper.setChild(key, convertedChild);
+                child = convertedChild;
+            }
+        }
+        try {
+            keys.push(key);
+            parents.push(currentValue); // maybe move to dic and list;
+            currentValue = child;
+            return match(node);
+        } finally {
+            keys.pop();
+            currentValue = parents.pop();
+        }
+    }
+
+    private MatchResult match(TemplateNode node) {
+        Object value = getCurrentValue();
         if (node.getValidators() != null) {
             for (SharedValidator validator : node.getValidators()) {
                 if (!validator.match(value, this)) {
@@ -60,8 +117,6 @@ public class Matcher {
         } else if (node instanceof ArrayNode) {
             if (value instanceof List) {
                 return matchList((List) value, (ArrayNode) node);
-            } else if (value instanceof Collection) {
-                return matchList(new ArrayList((Collection) value), (ArrayNode) node);
             } else {
                 return new ErrorValue(value, node);
             }
@@ -95,7 +150,7 @@ public class Matcher {
                     results.add(expectedNode);
                 long remainingTemplateLength = template.stream().skip(i).filter(RepeaterTemplateNode::isNotRepeater).count();
                 int remainingActualLength = actual.size() - j;
-                match = match(actualValue, template.get(i - 1));
+                match = matchNext(j, template.get(i - 1));
                 if (!match.hasDifference()
                         && remainingTemplateLength <= remainingActualLength
                         && lookAheadFail(actual, j, template, i + 1)) {
@@ -106,7 +161,7 @@ public class Matcher {
                     continue;
                 }
             } else {
-                match = match(actualValue, template.get(i++));
+                match = matchNext(j, template.get(i++));
             }
             hasError = hasError || match.hasDifference();
             if (quickFail && hasError) {
@@ -183,13 +238,13 @@ public class Matcher {
                 expectedNode = nextExpectedNode(expectedNodes);
                 continue;
             } else if (expectedNode != null && expectedNode.getKey() instanceof EvaluatorTemplateKey) { // Evaluator key
-                results.put(expectedNode.getKey(), match(((EvaluatorTemplateKey) expectedNode.getKey()).evaluate(actual, this), expectedNode));
+                results.put(expectedNode.getKey(), matchNext(expectedNode.getKey(), expectedNode));
                 expectedNode = nextExpectedNode(expectedNodes);
                 continue;
             } else if (expectedNode != null && expectedNode.getKey() instanceof MatcherTemplateKey) { // Matcher Key
                 results.put(expectedNode.getKey(), expectedNode); // Add it anyway
                 if (actualKey != EOS && ((MatcherTemplateKey) expectedNode.getKey()).match((String) actualKey, this) && !template.containsKey(actualKey)) {
-                    MatchResult match = match(actual.get(actualKey), expectedNode);
+                    MatchResult match = matchNext(actualKey, expectedNode);
                     if (match.hasDifference()) {
                         results.put(actualKey, match);
                     } // else do nothing
@@ -200,7 +255,7 @@ public class Matcher {
                 continue;
             } else if (expectedNode != null) { // Simple key
                 if (Objects.equals(actualKey, expectedNode.getKey().getValue())) { // Simple key found in right order
-                    results.put(expectedNode.getKey(), match(actual.get(actualKey), expectedNode));
+                    results.put(expectedNode.getKey(), matchNext(actualKey, expectedNode));
                     actualKey = nextActual(actualKeys);
                     expectedNode = nextExpectedNode(expectedNodes);
                     continue;
@@ -212,12 +267,16 @@ public class Matcher {
                     continue;
                 } else if (actual.containsKey(expectedNode.getKey().getValue())) { // Simple key found in wrong order
                     if (!ordered) { // if unordered add result in template order
-                        results.put(expectedNode.getKey(), match(actual.get(expectedNode.getKey().getValue()), expectedNode));
+                        results.put(expectedNode.getKey(), matchNext(expectedNode.getKey().getValue(), expectedNode));
                         foundKeys.add(expectedNode.getKey().getValue());
                         expectedNode = nextExpectedNode(expectedNodes);
                         continue;
                     }
-                } //TODO @!!!!!!!
+                } else { // simple key not found
+                    forceError = true;
+                    expectedNode = nextExpectedNode(expectedNodes);
+                    continue;
+                }
             }
             if (actualKey == EOS) { // No actual keys left, move to next expected key
                 expectedNode = nextExpectedNode(expectedNodes);
@@ -232,10 +291,10 @@ public class Matcher {
                     if (templateKey.getType() == TemplateKeyType.SIMPLE) {
                         if (ordered) {
                             forceError = true;
-                            results.put(templateKey, match(actual.get(actualKey), templateNode));
+                            results.put(templateKey, matchNext(actualKey, templateNode));
                         }
                     } else if (templateKey.getType() == TemplateKeyType.MATCHER) { // TODO Validate , look like we can add matching key twice
-                        MatchResult match = match(actual.get(actualKey), templateNode);
+                        MatchResult match = matchNext(actualKey, templateNode);
                         if (ordered) {
                             forceError = true;
                             results.put(templateKey, match);
@@ -265,5 +324,9 @@ public class Matcher {
 
     private static TemplateNode nextExpectedNode(Iterator<TemplateNode> expectedKeys) {
         return expectedKeys.hasNext() ? expectedKeys.next() : null;
+    }
+
+    public Object getParentSource() {
+        return parents.isEmpty()? null : Wrapper.source(parents.peek());
     }
 }

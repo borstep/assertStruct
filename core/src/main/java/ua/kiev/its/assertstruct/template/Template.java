@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import ua.kiev.its.assertstruct.AssertStruct;
 import ua.kiev.its.assertstruct.matcher.Matcher;
 import ua.kiev.its.assertstruct.result.MatchResult;
+import ua.kiev.its.assertstruct.result.RootResult;
 import ua.kiev.its.assertstruct.template.node.ArrayNode;
 import ua.kiev.its.assertstruct.template.node.ObjectNode;
 
@@ -28,7 +29,7 @@ public class Template {
         }
     }
 
-    public MatchResult match(Object value) {
+    public RootResult match(Object value) {
         return new Matcher(env, this).match(value);
     }
 

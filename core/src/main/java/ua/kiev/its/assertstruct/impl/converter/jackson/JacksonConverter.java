@@ -1,14 +1,27 @@
 package ua.kiev.its.assertstruct.impl.converter.jackson;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import ua.kiev.its.assertstruct.config.JsonConverterI;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.type.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+import ua.kiev.its.assertstruct.converter.JsonConverter;
 
-public class JacksonConverter implements JsonConverterI {
+import java.io.IOException;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class JacksonConverter implements JsonConverter {
+    @Getter
     ObjectMapper mapper;
+    @Getter
+    ObjectMapper baseMapper;
 
     public JacksonConverter() {
-        mapper = new ObjectMapper();
- /*       mapper.registerModule(new Module() {
+        baseMapper = new ObjectMapper();
+        mapper = baseMapper.copy();
+        com.fasterxml.jackson.databind.Module module = new com.fasterxml.jackson.databind.Module() {
             @Override
             public String getModuleName() {
                 return "JSONIFY";
@@ -22,237 +35,65 @@ public class JacksonConverter implements JsonConverterI {
             @Override
             public void setupModule(SetupContext context) {
                 context.addBeanSerializerModifier(new BeanSerializerModifier() {
+/*
+                    @Override
+                    public JsonSerializer<?> modifyKeySerializer(SerializationConfig config, JavaType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return super.modifyKeySerializer(config, valueType, beanDesc, serializer);
+                    }
+
+                    @Override
+                    public JsonSerializer<?> modifyEnumSerializer(SerializationConfig config, JavaType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return super.modifyEnumSerializer(config, valueType, beanDesc, serializer);
+                    }
+*/
+
+                    @Override
+                    public JsonSerializer<?> modifyMapLikeSerializer(SerializationConfig config, MapLikeType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return new WrapperSerializer(serializer);
+                    }
+
+                    @Override
+                    public JsonSerializer<?> modifyMapSerializer(SerializationConfig config, MapType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return new WrapperSerializer(serializer);
+                    }
+
+                    @Override
+                    public JsonSerializer<?> modifyCollectionLikeSerializer(SerializationConfig config, CollectionLikeType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return new WrapperSerializer(serializer);
+                    }
+
+                    @Override
+                    public JsonSerializer<?> modifyCollectionSerializer(SerializationConfig config, CollectionType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return new WrapperSerializer(serializer);
+                    }
+
+                    @Override
+                    public JsonSerializer<?> modifyArraySerializer(SerializationConfig config, ArrayType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return new WrapperSerializer(serializer);
+                    }
+
+                    @Override
+                    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                        return new WrapperSerializer(serializer);
+                    }
 
                 });
             }
-        });*/
+        };
+        mapper.registerModule(module);
     }
+
+    public Object pojo2jsonBase(Object value) {
+        return baseMapper.convertValue(value, Object.class);
+    }
+
     public Object pojo2json(Object value) {
-        return mapper.convertValue(value, Object.class);
+        try {
+            SimpleStructGenerator generator = new SimpleStructGenerator(mapper, false);
+            mapper.writeValue(generator, value);
+            return generator.getRootObject();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-/*
-    public Object pojo2json(Object value) {
-         mapper.writeValue(new JsonGenerator() {
-             @Override
-             public JsonGenerator setCodec(ObjectCodec oc) {
-                 return null;
-             }
-
-             @Override
-             public ObjectCodec getCodec() {
-                 return null;
-             }
-
-             @Override
-             public Version version() {
-                 return null;
-             }
-
-             @Override
-             public JsonStreamContext getOutputContext() {
-                 return null;
-             }
-
-             @Override
-             public JsonGenerator enable(Feature f) {
-                 return null;
-             }
-
-             @Override
-             public JsonGenerator disable(Feature f) {
-                 return null;
-             }
-
-             @Override
-             public boolean isEnabled(Feature f) {
-                 return false;
-             }
-
-             @Override
-             public int getFeatureMask() {
-                 return 0;
-             }
-
-             @Override
-             public JsonGenerator setFeatureMask(int values) {
-                 return null;
-             }
-
-             @Override
-             public JsonGenerator useDefaultPrettyPrinter() {
-                 return null;
-             }
-
-             @Override
-             public void writeStartArray() throws IOException {
-
-             }
-
-             @Override
-             public void writeEndArray() throws IOException {
-
-             }
-
-             @Override
-             public void writeStartObject() throws IOException {
-
-             }
-
-             @Override
-             public void writeEndObject() throws IOException {
-
-             }
-
-             @Override
-             public void writeFieldName(String name) throws IOException {
-
-             }
-
-             @Override
-             public void writeFieldName(SerializableString name) throws IOException {
-
-             }
-
-             @Override
-             public void writeString(String text) throws IOException {
-
-             }
-
-             @Override
-             public void writeString(char[] buffer, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public void writeString(SerializableString text) throws IOException {
-
-             }
-
-             @Override
-             public void writeRawUTF8String(byte[] buffer, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public void writeUTF8String(byte[] buffer, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public void writeRaw(String text) throws IOException {
-
-             }
-
-             @Override
-             public void writeRaw(String text, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public void writeRaw(char[] text, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public void writeRaw(char c) throws IOException {
-
-             }
-
-             @Override
-             public void writeRawValue(String text) throws IOException {
-
-             }
-
-             @Override
-             public void writeRawValue(String text, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public void writeRawValue(char[] text, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public void writeBinary(Base64Variant bv, byte[] data, int offset, int len) throws IOException {
-
-             }
-
-             @Override
-             public int writeBinary(Base64Variant bv, InputStream data, int dataLength) throws IOException {
-                 return 0;
-             }
-
-             @Override
-             public void writeNumber(int v) throws IOException {
-
-             }
-
-             @Override
-             public void writeNumber(long v) throws IOException {
-
-             }
-
-             @Override
-             public void writeNumber(BigInteger v) throws IOException {
-
-             }
-
-             @Override
-             public void writeNumber(double v) throws IOException {
-
-             }
-
-             @Override
-             public void writeNumber(float v) throws IOException {
-
-             }
-
-             @Override
-             public void writeNumber(BigDecimal v) throws IOException {
-
-             }
-
-             @Override
-             public void writeNumber(String encodedValue) throws IOException {
-
-             }
-
-             @Override
-             public void writeBoolean(boolean state) throws IOException {
-
-             }
-
-             @Override
-             public void writeNull() throws IOException {
-
-             }
-
-             @Override
-             public void writeObject(Object pojo) throws IOException {
-
-             }
-
-             @Override
-             public void writeTree(TreeNode rootNode) throws IOException {
-
-             }
-
-             @Override
-             public void flush() throws IOException {
-
-             }
-
-             @Override
-             public boolean isClosed() {
-                 return false;
-             }
-
-             @Override
-             public void close() throws IOException {
-
-             }
-         });
-    }
-*/
 }

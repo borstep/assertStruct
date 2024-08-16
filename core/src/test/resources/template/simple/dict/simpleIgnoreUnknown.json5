@@ -1,5 +1,5 @@
 {
-  '$config.ignoreUnknown': true,
+  '$opt.ignoreUnknown': true,
   key: 'value',
   key1: 'value1'
 }

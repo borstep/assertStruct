@@ -1,4 +1,4 @@
 [
-  '$config.ordered: false',
+  '$opt.ordered: false',
   'value'
 ]

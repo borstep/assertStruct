@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import ua.kiev.its.assertstruct.impl.parser.JSon5Parser;
+import ua.kiev.its.assertstruct.service.AssertStructService;
 import ua.kiev.its.assertstruct.template.Template;
 import ua.kiev.its.assertstruct.template.TemplateParseException;
 import ua.kiev.its.assertstruct.template.TemplateParser;
@@ -32,7 +33,7 @@ public class Res {
     @Getter
     ResourceLocation location;
     String content;
-    AssertStruct env;
+    AssertStructService env;
 
     @Getter(lazy = true)
     final ResourceLocation sourceLocation = calcSourceLocation();
@@ -44,7 +45,7 @@ public class Res {
      * @return resource
      */
     public static Res res(@NonNull String res) {
-        return res(res, codeLocator(), AssertStructUtils.getDefault());
+        return res(res, codeLocator(), AssertStruct.getDefault());
     }
 
     /**
@@ -57,7 +58,7 @@ public class Res {
      * @throws IllegalArgumentException if the resource cannot be found
      */
     public static Res from(String resPath) {
-        return from(resPath, codeLocator(), AssertStructUtils.getDefault());
+        return from(resPath, codeLocator(), AssertStruct.getDefault());
     }
 
     /**
@@ -67,10 +68,10 @@ public class Res {
      * @return a new Res object with the specified content
      */
     public static Res of(String content) {
-        return of(content, codeLocator(), AssertStructUtils.getDefault());
+        return of(content, codeLocator(), AssertStruct.getDefault());
     }
 
-    public static Res res(@NonNull String res, StackTraceElement traceElement, AssertStruct env) {
+    public static Res res(@NonNull String res, StackTraceElement traceElement, AssertStructService env) {
         boolean isFileResource = false;
         if (!res.isEmpty()) {
             char c = res.charAt(0);
@@ -93,7 +94,7 @@ public class Res {
         }
     }
 
-    static Res from(String resPath, StackTraceElement traceElement, AssertStruct locator) {
+    static Res from(String resPath, StackTraceElement traceElement, AssertStructService locator) {
         try {
             URL url;
             if (resPath.startsWith(Res.SIBLING_PREFIX)) {
@@ -121,18 +122,18 @@ public class Res {
     }
 
 
-    static Res of(String content, StackTraceElement traceElement, AssertStruct env) {
+    static Res of(String content, StackTraceElement traceElement, AssertStructService env) {
         return new Res(content,
                 ResourceLocation.fromStackTrace(traceElement), env);
     }
 
-    Res(URL resource, ResourceLocation location, AssertStruct env) {
+    Res(URL resource, ResourceLocation location, AssertStructService env) {
         this.resource = resource;
         this.location = location;
         this.env = env;
     }
 
-    Res(String content, ResourceLocation location, AssertStruct env) {
+    Res(String content, ResourceLocation location, AssertStructService env) {
         this.content = content;
         this.resource = location.getUrl();
         this.location = location;

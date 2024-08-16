@@ -8,8 +8,8 @@ import ua.kiev.its.assertstruct.template.Template;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static ua.kiev.its.assertstruct.AssertStructUtils.assertStruct;
-import static ua.kiev.its.assertstruct.TestUtils.mapOf;
+import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
+import static ua.kiev.its.assertstruct.utils.MapUtils.mapOf;
 
 
 class AnyObjectTest {

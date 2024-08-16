@@ -1,17 +1,15 @@
 package ua.kiev.its.assertstruct.result;
 
 import org.junit.jupiter.api.Test;
-import ua.kiev.its.assertstruct.AssertStruct;
 import ua.kiev.its.assertstruct.Res;
 import ua.kiev.its.assertstruct.template.Template;
-import ua.kiev.its.assertstruct.template.TemplateNode;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kiev.its.assertstruct.AssertStructUtils.assertStruct;
+import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
 import static ua.kiev.its.assertstruct.TestUtils.listOf;
-import static ua.kiev.its.assertstruct.TestUtils.mapOf;
+import static ua.kiev.its.assertstruct.utils.MapUtils.mapOf;
 
 class Json5PrinterTest {
 

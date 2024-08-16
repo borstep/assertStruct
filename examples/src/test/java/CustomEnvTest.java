@@ -1,13 +1,16 @@
 import org.junit.jupiter.api.Test;
 import ua.kiev.its.assertstruct.AssertStruct;
+import ua.kiev.its.assertstruct.service.AssertStructService;
 
 public class CustomEnvTest {
-    // TODO create example of define custom environment configuration
-    AssertStruct assertStruct = new AssertStruct();
-
     @Test
     public void assertTest() {
-        assertStruct.match("[1,5,3]", new int[]{1,2,3});
+        // TODO create example of define custom environment configuration
+        AssertStruct
+                .with()
+                .defaultOrderedLists(false)
+                .build()
+                .match("[1,3,2]", new int[]{1, 2, 3});
     }
 
     @Test

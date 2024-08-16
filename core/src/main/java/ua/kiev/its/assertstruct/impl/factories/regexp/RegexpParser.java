@@ -1,16 +1,16 @@
 package ua.kiev.its.assertstruct.impl.factories.regexp;
 
 
-import ua.kiev.its.assertstruct.config.KeyFactory;
-import ua.kiev.its.assertstruct.config.NodeFactory;
+import ua.kiev.its.assertstruct.service.*;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.template.TemplateKey;
 import ua.kiev.its.assertstruct.template.TemplateNode;
 
 import java.util.regex.Pattern;
 
-public class RegexpFactory implements KeyFactory, NodeFactory {
-    public static final RegexpFactory INSTANCE = new RegexpFactory();
+public class RegexpParser implements KeyParser, NodeParser, ParserFactory {
+
+    public static final RegexpParser INSTANCE = new RegexpParser();
     public static final String PREFIX = "$/";
 
     @Override
@@ -34,5 +34,10 @@ public class RegexpFactory implements KeyFactory, NodeFactory {
     @Override
     public String getPrefix() {
         return PREFIX;
+    }
+
+    @Override
+    public Parser buildParser(AssertStructService assertStructService) {
+        return INSTANCE;
     }
 }

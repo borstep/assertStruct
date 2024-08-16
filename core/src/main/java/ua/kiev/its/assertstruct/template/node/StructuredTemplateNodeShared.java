@@ -3,11 +3,11 @@ package ua.kiev.its.assertstruct.template.node;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ua.kiev.its.assertstruct.config.ConfigBuilder;
-import ua.kiev.its.assertstruct.config.SharedValidator;
-import ua.kiev.its.assertstruct.impl.config.ConfigTemplateNode;
-import ua.kiev.its.assertstruct.impl.config.NodeConfig;
-import ua.kiev.its.assertstruct.impl.config.SubtreeConfig;
+import ua.kiev.its.assertstruct.opt.OptionsBuilder;
+import ua.kiev.its.assertstruct.service.SharedValidator;
+import ua.kiev.its.assertstruct.impl.opt.OptionsNode;
+import ua.kiev.its.assertstruct.impl.opt.NodeOptions;
+import ua.kiev.its.assertstruct.impl.opt.SubtreeOptions;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.impl.validator.TypeCheckValidator;
 import ua.kiev.its.assertstruct.template.StructTemplateNode;
@@ -31,15 +31,14 @@ public class StructuredTemplateNodeShared {
     @Setter
     ExtToken token;
 
+    @Getter
+    NodeOptions config;
+    NodeOptions.NodeOptionsBuilder configBuilder;
 
     @Getter
-    NodeConfig config;
-    NodeConfig.NodeConfigBuilder configBuilder;
-
+    SubtreeOptions subtreeOptions;
     @Getter
-    SubtreeConfig subtreeConfig;
-    @Getter
-    SubtreeConfig.SubtreeConfigBuilder subtreeConfigBuilder;
+    SubtreeOptions.SubtreeOptionsBuilder subtreeConfigBuilder;
 
     Set<SharedValidator> _validators = null;
 
@@ -56,37 +55,37 @@ public class StructuredTemplateNodeShared {
 
     public void addConfig(String name, TemplateNode value) {
         if (configBuilder == null)
-            configBuilder = new NodeConfig.NodeConfigBuilder();
+            configBuilder = new NodeOptions.NodeOptionsBuilder();
         set(name, value, configBuilder);
     }
 
     public void addSubtreeConfig(String name, TemplateNode value) {
         if (subtreeConfigBuilder == null)
-            subtreeConfigBuilder = new SubtreeConfig.SubtreeConfigBuilder();
+            subtreeConfigBuilder = new SubtreeOptions.SubtreeOptionsBuilder();
         set(name, value, subtreeConfigBuilder);
     }
 
-    private static void set(String name, TemplateNode value, ConfigBuilder configBuilder) {
+    private static void set(String name, TemplateNode value, OptionsBuilder optionsBuilder) {
         if (value instanceof ObjectNode) {
             for (Map.Entry<String, TemplateNode> entry : ((ObjectNode) value).entrySet()) {
-                set(entry.getKey(), entry.getValue(), configBuilder);
+                set(entry.getKey(), entry.getValue(), optionsBuilder);
             }
-        } else if (value instanceof ConfigTemplateNode) {
-            configBuilder.set(((ConfigTemplateNode) value).getName(), ((ConfigTemplateNode) value).getValue());
+        } else if (value instanceof OptionsNode) {
+            optionsBuilder.set(((OptionsNode) value).getName(), ((OptionsNode) value).getValue());
         } else if (value instanceof ValueNode) {
-            configBuilder.set(name, ((ValueNode) value).getValue());
+            optionsBuilder.set(name, ((ValueNode) value).getValue());
         } else {
             throw new IllegalArgumentException("Unsupported value type: " + value.getClass().getName() + " in configuration");
         }
     }
 
-    public void sealConfigs(SubtreeConfig parentConfig) {
+    public void sealConfigs(SubtreeOptions parentConfig) {
         if (subtreeConfigBuilder != null) {
             parentConfig = subtreeConfigBuilder.build(parentConfig);
         }
         boolean isDict = !(children instanceof ArrayNode);
         config = configBuilder == null ?
-                NodeConfig.NodeConfigBuilder.buildDefault(parentConfig, isDict) :
+                NodeOptions.NodeOptionsBuilder.buildDefault(parentConfig, isDict) :
                 configBuilder.build(parentConfig, isDict);
         for (TemplateNode child : children) {
             if (child.isStruct()) {

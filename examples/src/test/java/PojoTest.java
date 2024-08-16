@@ -2,14 +2,11 @@ import example.model.Address;
 import example.model.Contact;
 import example.model.Person;
 import org.junit.jupiter.api.Test;
-import ua.kiev.its.assertstruct.Res;
-
-import java.net.URL;
 
 import static example.model.ContactType.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ua.kiev.its.assertstruct.AssertStructUtils.assertStruct;
+import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
 
 
 public class PojoTest {

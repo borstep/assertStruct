@@ -16,7 +16,7 @@ In case of failure, the difference will be transformed into a simple text presen
 
 # AssertStruct in 30 sec
 ```java
-import static ua.kiev.its.assertstruct.AssertStructUtils.assertStruct;
+import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
 
 public class PojoTest {
     @Test
@@ -51,7 +51,7 @@ Diff row will be transformed to a link which open diff editor for pojo.json5 fil
 # Motivation
 There are many great libraries to validate complex Java objects. However, they are often missing 2 points: 
 1. You need to write significant amount of code to validate all required parts of data. This code can be difficult to write and understand.
-Also, because of complexity, developers tends to check only some parts of resulting structure. Which can lead to missed errors and corner cases.  
+Also, because of complexity, developers tends to check only some parts of resulting structure. Which can lead to missed errors and edge cases.  
 2. You must not only write your test, but also maintained them. In 80% of cases when test failed (or mistakenly not failed), 
 it's not actually a bug in code, but wrong test which you must modify because of requirement changes or missed earlier cases.
 And in typical scenario to fix test you will need to read and decrypt a bunch of java code and then write even more code to cover required scenario.
@@ -110,7 +110,7 @@ Maven
 ```
 Usually you will use default configuration of AssertStruct and static method imported from AssertStructUtils.
 ```java
-import static ua.kiev.its.assertstruct.AssertStructUtils.assertStruct;
+import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
 ...
     @Test
     public void inlineTemplateTest() {
@@ -208,8 +208,8 @@ However this can be changed by inline configuration
 or in shorter form 
 ```json5
 {
-  '$config.ignoreUnknown': true,
-  '$config.ordered': true,
+  '$opt.ignoreUnknown': true,
+  '$opt.ordered': true,
 }
 ```
 There 2 types patterns in keys are supported:
@@ -220,7 +220,7 @@ By default, elements of array are ordered and each element of array must be matc
 This can be changed by inline configuration, because keys are not allowed in array eac configuration must be presented as special string element in array.
 ```json5
 [
-  '$config.ordered: true',
+  '$opt.ordered: true',
 ]
 ```
 To support arrays of unknown size it is possible to add special values matcher as array element **'$...'** 
@@ -241,23 +241,21 @@ means any value assignable to java.lang.Number
 
 ### Matchers
 
-| Pattern            | Description           | Note                                                                           | Key | Impl |
-|--------------------|-----------------------|--------------------------------------------------------------------------------|-----|------| 
-| $*                 | Any value             | Includes all types, Maps, Lists, null, etc.                                    | [x] |      |
-| ${*}               | Any Object            | Includes Maps, Objects, etc.                                                   |     |      |
-| $[*]               | Any List              | Include collections and arrays                                                 |     |      |
-| $NOW               | Current date          | Compare with current date with default precision (1 min)                       |     | -    |
-| $NOW(n)            | Current date          | Compare with current date with precision of n second                           |     | -    |
-| $ANY_DATE          | Any date              | Value can be parsed as date with time using default format                     |     | -    |
-| $ANY_DATE(xxx)     | Any date              | Value can be parsed as date with time using format 'xxx'                       |     | -    |
-| $ANY_DATETIME      | Any date time         | Value can be parsed as date using default format                               |     | -    |
-| $ANY_DATETIME(xxx) | Any date time         | Value can be parsed as date using format 'xxx'                                 |     | -    |
-| $ANY_TIME          | Any time              | Value can be parsed as time using default format                               |     | -    |
-| $ANY_TIME(xxx)     | Any time              | Value can be parsed as time using format 'xxx'                                 |     | -    |
-| $/regexp/          | Regexp                | Value matched by regular expression                                            | [x] |      |
-| $.name1.method1()  | Simple evaluator      | Calculate value of field, property or no-arg method                            | [x] | -    |
-| #expresion         | Calculate expression  | Calculate complex expression using external library. By default SpEL. optional | [x] | -    |
-|                    |                       |                                                                                |     |      |
+| Pattern            | Description           | Note                                                                            | Key | Impl |
+|--------------------|-----------------------|---------------------------------------------------------------------------------|-----|------| 
+| $*                 | Any value             | Includes all types, Maps, Lists, null, etc.                                     | [x] |      |
+| ${*}               | Any Object            | Includes Maps, Objects, etc.                                                    |     |      |
+| $[*]               | Any List              | Include collections and arrays                                                  |     |      |
+| $NOW               | Current date          | Compare with current date with default precision (1 min)                        |     | -    |
+| $NOW(n)            | Current date          | Compare with current date with precision of n second                            |     | -    |
+| $ANY_DATE          | Any date              | Value can be parsed as date with time using default format                      |     |      |
+| $ANY_DATETIME      | Any date time         | Value can be parsed as date using default format                                |     |      |
+| $ANY_TIME          | Any time              | Value can be parsed as time using default format                                |     |      |
+| $DATE(xxx)         | Any time              | Value can be parsed as date or time using format 'xxx'                          |     | -    |
+| $/regexp/          | Regexp                | Value matched by regular expression                                             | [x] |      |
+| $.name1.method1()  | Simple evaluator      | Calculate value of field, property or no-arg method                             | [x] | -    |
+| #expresion         | Calculate expression  | Calculate complex expression using external library. By default SpEL. optional  | [x] |      |
+|                    |                       |                                                                                 |     |      |
 
 # Requirements
 * Java 8+.

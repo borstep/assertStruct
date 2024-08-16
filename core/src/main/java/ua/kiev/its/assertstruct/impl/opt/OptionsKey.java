@@ -1,4 +1,4 @@
-package ua.kiev.its.assertstruct.impl.config;
+package ua.kiev.its.assertstruct.impl.opt;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,11 +10,11 @@ import ua.kiev.its.assertstruct.template.TemplateKeyType;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-public class ConfigTemplateKey extends TemplateKey {
+public class OptionsKey extends TemplateKey {
     TemplateKeyType type;
     String propertyName;
 
-    public ConfigTemplateKey(TemplateKeyType configType, @NonNull String value, String propertyName, ExtToken token) {
+    public OptionsKey(TemplateKeyType configType, @NonNull String value, String propertyName, ExtToken token) {
         super(value, token);
         this.propertyName = propertyName;
         this.type = configType;

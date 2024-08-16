@@ -3,7 +3,7 @@ package ua.kiev.its.assertstruct.template;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import ua.kiev.its.assertstruct.impl.config.NodeConfig;
+import ua.kiev.its.assertstruct.impl.opt.NodeOptions;
 import ua.kiev.its.assertstruct.impl.parser.JSon5Parser;
 import ua.kiev.its.assertstruct.Res;
 
@@ -50,17 +50,17 @@ class TemplateParserTest {
     void fullConfigWithInheritance() throws IOException {
         Template template = parse("template/config/fullConfigWithInheritance.json5");
 
-        assertEquals(new NodeConfig(
+        assertEquals(new NodeOptions(
                 false,
                 true,
                 true,
                 false), template.asStruct().getConfig(), "Wrong root node");
-        assertEquals(new NodeConfig(
+        assertEquals(new NodeOptions(
                 true,
                 true,
                 true,
                 true), template.asDict().getByKey("child").asDict().getConfig(), "Wrong inherited node");
-        assertEquals(new NodeConfig(
+        assertEquals(new NodeOptions(
                 true,
                 true,
                 true,

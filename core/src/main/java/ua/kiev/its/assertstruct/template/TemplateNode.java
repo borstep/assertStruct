@@ -1,6 +1,6 @@
 package ua.kiev.its.assertstruct.template;
 
-import ua.kiev.its.assertstruct.config.SharedValidator;
+import ua.kiev.its.assertstruct.service.SharedValidator;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.impl.validator.TypeCheckValidator;
 import ua.kiev.its.assertstruct.result.MatchResult;
@@ -34,7 +34,7 @@ public interface TemplateNode extends MatchResult<TemplateNode> {
         }
     }
 
-    default void print(StringBuilder out, boolean forceComa, boolean forceEOL, int indent, boolean fromNewLine) throws IOException {
+    default void print(StringBuilder out, boolean forceComa, boolean forceEOL, int indent, boolean fromNewLine) {
         ExtToken token = getToken();
         token.print(out, forceComa, forceEOL);
     }
@@ -52,7 +52,7 @@ public interface TemplateNode extends MatchResult<TemplateNode> {
         return false;
     }
 
-    default void printStart(StringBuilder out) throws IOException {
+    default void printStart(StringBuilder out) {
         if (isScalar()) {
             getStartToken().printPrefix(out);
         } else {
@@ -60,7 +60,7 @@ public interface TemplateNode extends MatchResult<TemplateNode> {
         }
     }
 
-    default void printEnd(StringBuilder out, boolean forceComa, boolean forceEOL) throws IOException {
+    default void printEnd(StringBuilder out, boolean forceComa, boolean forceEOL) {
         if (isScalar()) {
             getToken().printSuffix(out, forceComa, forceEOL);
         } else {

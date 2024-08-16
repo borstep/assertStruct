@@ -3,7 +3,7 @@ package ua.kiev.its.assertstruct.template.node;
 import lombok.AccessLevel;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
-import ua.kiev.its.assertstruct.impl.config.ConfigTemplateKey;
+import ua.kiev.its.assertstruct.impl.opt.OptionsKey;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.matcher.Matcher;
 import ua.kiev.its.assertstruct.template.*;
@@ -76,9 +76,9 @@ public class ObjectNode extends LinkedHashMap<String, TemplateNode> implements S
             matchedNodes.put(keyValue, value);
         } else if (key.getType().isConfig()) {
             if (key.getType().isSubtreeConfig()) {
-                shared.addSubtreeConfig(((ConfigTemplateKey) key).getPropertyName(), value);
+                shared.addSubtreeConfig(((OptionsKey) key).getPropertyName(), value);
             } else {
-                shared.addConfig(((ConfigTemplateKey) key).getPropertyName(), value);
+                shared.addConfig(((OptionsKey) key).getPropertyName(), value);
             }
         }
         return super.put(keyValue, value);

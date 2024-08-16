@@ -5,12 +5,16 @@ import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import ua.kiev.its.assertstruct.AssertStruct;
+import ua.kiev.its.assertstruct.service.AssertStructService;
+import ua.kiev.its.assertstruct.service.Config;
 
 import java.io.Closeable;
 import java.io.IOException;
 
 public class JSon5Parser implements Closeable {
-    private AssertStruct config;
+    private AssertStructService env;
+    Config config;
+
     private char[] source;
     //    private Stack<TemplateToken> stack = new Stack<>();
 //    private int lastInlineCommentStart = -1;
@@ -19,12 +23,13 @@ public class JSon5Parser implements Closeable {
     JsonParser parser = null;
 
     public JSon5Parser(char[] source) {
-        this(source, AssertStruct.getDefaultInstance());
+        this(source, AssertStruct.getDefault());
     }
 
-    public JSon5Parser(char[] source, AssertStruct config) {
+    public JSon5Parser(char[] source, AssertStructService env) {
         this.source = source;
-        this.config = config;
+        this.env = env;
+        this.config = env.getConfig();
     }
 
     private void init() throws IOException {

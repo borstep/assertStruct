@@ -2,15 +2,15 @@ package ua.kiev.its.assertstruct.matcher;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import ua.kiev.its.assertstruct.AssertStruct;
-import ua.kiev.its.assertstruct.config.SharedValidator;
+import ua.kiev.its.assertstruct.service.AssertStructService;
+import ua.kiev.its.assertstruct.service.Config;
+import ua.kiev.its.assertstruct.service.SharedValidator;
 import ua.kiev.its.assertstruct.converter.ListWrapper;
 import ua.kiev.its.assertstruct.converter.MapWrapper;
 import ua.kiev.its.assertstruct.converter.Wrapper;
-import ua.kiev.its.assertstruct.impl.config.ConfigTemplateKey;
+import ua.kiev.its.assertstruct.impl.opt.OptionsKey;
 import ua.kiev.its.assertstruct.impl.factories.array.RepeaterTemplateNode;
 import ua.kiev.its.assertstruct.result.*;
 import ua.kiev.its.assertstruct.template.*;
@@ -23,21 +23,27 @@ import static ua.kiev.its.assertstruct.impl.factories.array.RepeaterTemplateNode
 import static ua.kiev.its.assertstruct.utils.ConversionUtils.*;
 import static ua.kiev.its.assertstruct.utils.Markers.*;
 
-@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Matcher {
     @Getter
     @Setter(value = AccessLevel.NONE)
-    final AssertStruct env;
+    private final AssertStructService env;
+    private final Config config;
 
     @Getter
     @Setter(value = AccessLevel.NONE)
-    final Template template;
+    private final Template template;
 
-    Object rootValue;
-    Object currentValue;
-    ArrayDeque<Object> parents = new ArrayDeque<>();
-    ArrayDeque<Object> keys = new ArrayDeque<>();
+    private Object rootValue;
+    private Object currentValue;
+    private ArrayDeque<Object> parents = new ArrayDeque<>();
+    private ArrayDeque<Object> keys = new ArrayDeque<>();
+
+    public Matcher(AssertStructService env, Template template) {
+        this.env = env;
+        this.template = template;
+        this.config = env.getConfig();
+    }
 
 
     public RootResult match(Object value) {
@@ -64,7 +70,7 @@ public class Matcher {
         } else if (value instanceof Collection) {
             return new ListWrapper((Collection) value);
         } else {
-            return env.getJsonConverter().pojo2json(value);
+            return config.getJsonConverter().pojo2json(value);
         }
     }
 
@@ -140,7 +146,7 @@ public class Matcher {
             MatchResult<TemplateNode> match;
             if (expectedNode == null) { // template is shorter than actual list
                 match = new ErrorValue(actualValue);
-            } else if (expectedNode.isConfig() || expectedNode.getKey() instanceof ConfigTemplateKey) { // Configuration
+            } else if (expectedNode.isConfig() || expectedNode.getKey() instanceof OptionsKey) { // Configuration
                 results.add(expectedNode); // Just copy config as is
                 i++;
                 j--; //rerun same actual node
@@ -233,7 +239,7 @@ public class Matcher {
                 foundKeys.remove(actualKey);
                 actualKey = nextActual(actualKeys);
                 continue;
-            } else if (expectedNode != null && expectedNode.getKey() instanceof ConfigTemplateKey) { // Configuration
+            } else if (expectedNode != null && expectedNode.getKey() instanceof OptionsKey) { // Configuration
                 results.put(expectedNode.getKey(), expectedNode); // Just copy config as is
                 expectedNode = nextExpectedNode(expectedNodes);
                 continue;
@@ -327,6 +333,6 @@ public class Matcher {
     }
 
     public Object getParentSource() {
-        return parents.isEmpty()? null : Wrapper.source(parents.peek());
+        return parents.isEmpty() ? null : Wrapper.source(parents.peek());
     }
 }

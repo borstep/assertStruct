@@ -1,6 +1,6 @@
-package ua.kiev.its.assertstruct.config;
+package ua.kiev.its.assertstruct.service;
 
-public interface ParsingFactory {
+public interface Parser {
     /**
      * Order in which this factories will be used. Lower number means higher priority
      *

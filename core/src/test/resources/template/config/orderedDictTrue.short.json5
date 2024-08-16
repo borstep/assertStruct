@@ -1,4 +1,4 @@
 {
-  '$config.ordered': true,
+  '$opt.ordered': true,
   key: 'value'
 }

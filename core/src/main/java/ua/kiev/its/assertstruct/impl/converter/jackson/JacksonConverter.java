@@ -1,15 +1,20 @@
 package ua.kiev.its.assertstruct.impl.converter.jackson;
 
 import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.*;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import ua.kiev.its.assertstruct.converter.JsonConverter;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JacksonConverter implements JsonConverter {
@@ -20,6 +25,8 @@ public class JacksonConverter implements JsonConverter {
 
     public JacksonConverter() {
         baseMapper = new ObjectMapper();
+        baseMapper.registerModule(new JavaTimeModule());// TODO make configurable
+        baseMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
         mapper = baseMapper.copy();
         com.fasterxml.jackson.databind.Module module = new com.fasterxml.jackson.databind.Module() {
             @Override

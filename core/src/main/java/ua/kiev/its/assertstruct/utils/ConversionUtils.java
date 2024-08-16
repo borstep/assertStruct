@@ -39,4 +39,13 @@ public class ConversionUtils {
     public static boolean isSimpleJsonType(Object value) {
         return value==null || value instanceof String || value instanceof Number || value instanceof Boolean;
     }
+
+    public static Boolean String2Boolean(String value) {
+        return Boolean.getBoolean(value);
+    }
+
+    public static Integer Integer2Boolean(String value) {
+        return Integer.parseInt(value);
+    }
+
 }

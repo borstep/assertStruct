@@ -14,9 +14,9 @@ import ua.kiev.its.assertstruct.template.AbstractEvaluatorKey;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class SpelKey extends AbstractEvaluatorKey {
     Expression expression;
-    SpelFactory spelFactory;
+    SpelParser spelFactory;
 
-    public SpelKey(Expression expression, @NonNull String value, ExtToken token, SpelFactory spelFactory) {
+    public SpelKey(Expression expression, @NonNull String value, ExtToken token, SpelParser spelFactory) {
         super(value, token);
         this.expression = expression;
         this.spelFactory = spelFactory;

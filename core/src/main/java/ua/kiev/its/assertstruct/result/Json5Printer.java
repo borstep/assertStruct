@@ -1,8 +1,9 @@
 package ua.kiev.its.assertstruct.result;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ua.kiev.its.assertstruct.AssertStruct;
+import ua.kiev.its.assertstruct.service.AssertStructService;
+import ua.kiev.its.assertstruct.service.Config;
 import ua.kiev.its.assertstruct.converter.Wrapper;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.template.TemplateKey;
@@ -18,31 +19,38 @@ import java.util.Iterator;
 import java.util.Map;
 
 
-@RequiredArgsConstructor
 public class Json5Printer {
     @Getter
-    private final AssertStruct config;
+    private final AssertStructService env;
+    @Getter
+    private final Config config;
     @Getter
     private final StringBuilder out;
 
     public Json5Printer() {
-        this(AssertStruct.getDefaultInstance(), new StringBuilder());
+        this(AssertStruct.getDefault(), new StringBuilder());
     }
 
     public Json5Printer(StringBuilder out) {
-        this(AssertStruct.getDefaultInstance(), out);
+        this(AssertStruct.getDefault(), out);
     }
 
-    public Json5Printer(AssertStruct config) {
+    public Json5Printer(AssertStructService config) {
         this(config, new StringBuilder());
     }
 
-    public String print(Object value) throws IOException {
+    public Json5Printer(AssertStructService env, StringBuilder out) {
+        this.env = env;
+        this.out = out;
+        this.config = env.getConfig();
+    }
+
+    public String print(Object value) {
         print(value, false, false, 0, true);
         return out.toString();
     }
 
-    private void print(Object value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) throws IOException {
+    private void print(Object value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
         if (value instanceof Wrapper) {
             value = ((Wrapper) value).getValue();
         }
@@ -60,7 +68,7 @@ public class Json5Printer {
         }
     }
 
-    private void printDict(Map value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) throws IOException {
+    private void printDict(Map value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
         ObjectNode matchedTo = null;
         if (value instanceof ErrorMap) {
             matchedTo = ((ErrorMap) value).getMatchedTo();
@@ -97,10 +105,10 @@ public class Json5Printer {
     }
 
     private int appendKey(Object childKey) { //TODO optimize performance
-        return Json5Encoder.encodeKey(childKey, out, config.getQuote(), config.getForceKeyQuoting());
+        return Json5Encoder.encodeKey(childKey, out, config.getQuote(), config.isForceKeyQuoting());
     }
 
-    private void printList(Collection value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) throws IOException {
+    private void printList(Collection value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
         ArrayNode matchedTo = null;
         if (value instanceof ErrorList) {
             matchedTo = ((ErrorList) value).getMatchedTo();
@@ -125,7 +133,7 @@ public class Json5Printer {
         printEnd(trailingComma, trailingEOL, matchedTo, indent, "]");
     }
 
-    private void printValue(Object value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) throws IOException {
+    private void printValue(Object value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
         TemplateNode matchedTo = null;
         if (value instanceof ErrorValue) {
             matchedTo = ((ErrorValue) value).getMatchedTo();
@@ -156,7 +164,7 @@ public class Json5Printer {
         out.append(quote);
     }
 
-    private void printStart(int indent, TemplateNode matchedTo, String startValue) throws IOException {
+    private void printStart(int indent, TemplateNode matchedTo, String startValue) {
         if (matchedTo != null) {
             matchedTo.printStart(out);
         } else {
@@ -167,7 +175,7 @@ public class Json5Printer {
         }
     }
 
-    private void printEnd(boolean trailingComma, boolean trailingEOL, TemplateNode matchedTo, int indent, String endValue) throws IOException {
+    private void printEnd(boolean trailingComma, boolean trailingEOL, TemplateNode matchedTo, int indent, String endValue) {
         if (matchedTo != null) {
             matchedTo.printEnd(out, trailingComma, trailingEOL);
         } else {
@@ -184,7 +192,7 @@ public class Json5Printer {
         }
     }
 
-    private void indent(int indent) throws IOException {
+    private void indent(int indent) {
         while (indent-- > 0)
             out.append(' ');
     }

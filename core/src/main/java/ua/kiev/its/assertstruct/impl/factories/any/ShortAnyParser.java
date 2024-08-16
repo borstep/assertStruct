@@ -1,14 +1,13 @@
 package ua.kiev.its.assertstruct.impl.factories.any;
 
-import ua.kiev.its.assertstruct.config.KeyFactory;
-import ua.kiev.its.assertstruct.config.NodeFactory;
+import ua.kiev.its.assertstruct.service.*;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.template.TemplateKey;
 import ua.kiev.its.assertstruct.template.TemplateNode;
 
-public class ShortAnyFactory implements KeyFactory, NodeFactory {
+public class ShortAnyParser implements KeyParser, NodeParser, ParserFactory {
 
-    public static final ShortAnyFactory INSTANCE = new ShortAnyFactory();
+    public static final ShortAnyParser INSTANCE = new ShortAnyParser();
     public static final String PREFIX = "$*";
 
     @Override
@@ -30,5 +29,10 @@ public class ShortAnyFactory implements KeyFactory, NodeFactory {
     @Override
     public String getPrefix() {
         return PREFIX;
+    }
+
+    @Override
+    public Parser buildParser(AssertStructService assertStructService) {
+        return INSTANCE;
     }
 }

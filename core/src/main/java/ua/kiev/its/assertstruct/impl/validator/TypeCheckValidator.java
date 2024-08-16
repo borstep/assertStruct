@@ -3,7 +3,7 @@ package ua.kiev.its.assertstruct.impl.validator;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
-import ua.kiev.its.assertstruct.config.SharedValidator;
+import ua.kiev.its.assertstruct.service.SharedValidator;
 import ua.kiev.its.assertstruct.matcher.Matcher;
 
 import java.util.regex.Pattern;

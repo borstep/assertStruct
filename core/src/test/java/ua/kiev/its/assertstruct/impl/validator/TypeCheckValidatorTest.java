@@ -5,19 +5,15 @@ import data.ValueObject;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 import ua.kiev.its.assertstruct.Res;
-import ua.kiev.its.assertstruct.config.SharedValidator;
-import ua.kiev.its.assertstruct.impl.factories.any.AnyNode;
-import ua.kiev.its.assertstruct.impl.factories.variable.ConstantNode;
-import ua.kiev.its.assertstruct.impl.factories.variable.matcher.AnyList;
+import ua.kiev.its.assertstruct.service.SharedValidator;
 import ua.kiev.its.assertstruct.template.Template;
 import ua.kiev.its.assertstruct.template.TemplateNode;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kiev.its.assertstruct.AssertStructUtils.assertStruct;
+import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
 import static ua.kiev.its.assertstruct.TestUtils.listOf;
 
 class TypeCheckValidatorTest {

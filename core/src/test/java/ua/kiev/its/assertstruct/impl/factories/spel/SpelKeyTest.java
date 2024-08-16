@@ -5,12 +5,12 @@ import org.opentest4j.AssertionFailedError;
 import ua.kiev.its.assertstruct.Res;
 import ua.kiev.its.assertstruct.template.Template;
 import ua.kiev.its.assertstruct.template.TemplateNode;
+import ua.kiev.its.assertstruct.utils.MapUtils;
 
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kiev.its.assertstruct.AssertStructUtils.*;
-import static ua.kiev.its.assertstruct.TestUtils.*;
+import static ua.kiev.its.assertstruct.AssertStruct.*;
 
 public class SpelKeyTest {
     @Test
@@ -30,7 +30,7 @@ public class SpelKeyTest {
     @Test
     void matchFail() {
         AssertionFailedError assertionFailedError = assertThrows(AssertionFailedError.class,
-                () -> assertStruct("{ '#size()': 0 }", mapOf("key", "value")));
+                () -> assertStruct("{ '#size()': 0 }", MapUtils.mapOf("key", "value")));
         assertEquals("{ '#size()': 1, key: 'value' }", assertionFailedError.getActual().getValue());
     }
 

@@ -9,16 +9,6 @@ public interface MatchResult<T extends TemplateNode> {
 
     T getMatchedTo();
 
-    default String asString() {
-        try {
-            Json5Printer printer = new Json5Printer();
-            printer.print(this);
-            return printer.getOut().toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     default boolean isConfig() {
         return false;
     }

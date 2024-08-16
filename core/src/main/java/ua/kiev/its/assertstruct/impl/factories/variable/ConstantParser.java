@@ -1,16 +1,18 @@
 package ua.kiev.its.assertstruct.impl.factories.variable;
 
 import lombok.Value;
-import ua.kiev.its.assertstruct.AssertStruct;
-import ua.kiev.its.assertstruct.config.NodeFactory;
+import ua.kiev.its.assertstruct.service.AssertStructService;
+import ua.kiev.its.assertstruct.service.NodeParser;
+import ua.kiev.its.assertstruct.service.Parser;
+import ua.kiev.its.assertstruct.service.ParserFactory;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.template.TemplateKey;
 import ua.kiev.its.assertstruct.template.TemplateNode;
 
 @Value
-public class ConstantFactory implements NodeFactory {
+public class ConstantParser implements NodeParser, ParserFactory {
+    public static final ConstantParser INSTANCE = new ConstantParser();
     public static final String PREFIX = "$";
-    AssertStruct env;
 
     @Override
     public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
@@ -25,5 +27,10 @@ public class ConstantFactory implements NodeFactory {
     @Override
     public String getPrefix() {
         return PREFIX;
+    }
+
+    @Override
+    public Parser buildParser(AssertStructService assertStructService) {
+        return INSTANCE;
     }
 }

@@ -77,13 +77,13 @@ public class ExtToken {
         return quoteChar == '"';
     }
 
-    public void print(StringBuilder out, boolean forceComa, boolean forceEOL) throws IOException {
+    public void print(StringBuilder out, boolean forceComa, boolean forceEOL) {
         printPrefix(out);
         out.append(_source, start, end - start + 1);
         printSuffix(out, forceComa, forceEOL);
     }
 
-    public void printDebug(StringBuilder out) throws IOException {
+    public void printDebug(StringBuilder out) {
         out.append('<');
         printPrefix(out);
         out.append('<');
@@ -101,11 +101,11 @@ public class ExtToken {
                 + " )";
     }
 
-    public void printPrefix(StringBuilder out) throws IOException {
+    public void printPrefix(StringBuilder out) {
         out.append(_source, prefix, start - prefix);
     }
 
-    public void printSuffix(StringBuilder out, boolean forceComa, boolean forceEOL) throws IOException {
+    public void printSuffix(StringBuilder out, boolean forceComa, boolean forceEOL) {
         if (forceComa && !isComaIncluded()) {
             out.append(",");
         }

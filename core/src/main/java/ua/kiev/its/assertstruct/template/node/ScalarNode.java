@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import ua.kiev.its.assertstruct.config.SharedValidator;
+import ua.kiev.its.assertstruct.service.SharedValidator;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.impl.validator.TypeCheckValidator;
 import ua.kiev.its.assertstruct.matcher.ValueMatcher;

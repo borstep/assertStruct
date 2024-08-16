@@ -11,15 +11,14 @@ import ua.kiev.its.assertstruct.template.TemplateKey;
 import ua.kiev.its.assertstruct.template.node.ScalarNode;
 
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class SpelNode extends ScalarNode {
     Expression expression;
-    SpelFactory spelFactory;
+    SpelParser spelFactory;
 
-    public SpelNode(Expression expression, TemplateKey key, ExtToken token, SpelFactory spelFactory) {
+    public SpelNode(Expression expression, TemplateKey key, ExtToken token, SpelParser spelFactory) {
         super(key, token);
         this.expression = expression;
         this.spelFactory = spelFactory;

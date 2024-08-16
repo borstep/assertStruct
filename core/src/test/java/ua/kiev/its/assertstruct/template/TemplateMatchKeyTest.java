@@ -1,6 +1,7 @@
 package ua.kiev.its.assertstruct.template;
 
 import org.junit.jupiter.api.Test;
+import ua.kiev.its.assertstruct.utils.MapUtils;
 
 import java.io.IOException;
 
@@ -10,7 +11,7 @@ class TemplateMatchKeyTest {
 
     @Test
     void matchSingleKeyOK() throws IOException {
-        checkOK("template/simple/dict/match.json5", mapOf(
+        checkOK("template/simple/dict/match.json5", MapUtils.mapOf(
                 "key", "value"
                 , "keyMatch", "value2"
                 , "key3", "value3"
@@ -19,7 +20,7 @@ class TemplateMatchKeyTest {
 
     @Test
     void matchMultiKeyOK() throws IOException {
-        checkOK("template/simple/dict/match.json5", mapOf(
+        checkOK("template/simple/dict/match.json5", MapUtils.mapOf(
                 "key", "value"
                 , "keyMatch", "value2"
                 , "key2Match", "value2"
@@ -29,7 +30,7 @@ class TemplateMatchKeyTest {
 
     @Test
     void matchWrongOrderOK() throws IOException {
-        checkOK("template/simple/dict/match.json5", mapOf(
+        checkOK("template/simple/dict/match.json5", MapUtils.mapOf(
                 "keyMatch", "value2"
                 , "key2Match", "value2"
                 , "key", "value"
@@ -39,7 +40,7 @@ class TemplateMatchKeyTest {
 
     @Test
     void matchOrderedOK() throws IOException {
-        checkOK("template/simple/dict/matchOrdered.json5", mapOf(
+        checkOK("template/simple/dict/matchOrdered.json5", MapUtils.mapOf(
                 "key", "value"
                 , "keyMatch", "value2"
                 , "key2Match", "value2"
@@ -50,7 +51,7 @@ class TemplateMatchKeyTest {
     @Test
     void matchOrderedFail() throws IOException {
         checkFail("template/simple/dict/matchOrdered.json5",
-                "template/simple/dict/matchOrdered.wrongOrder.json5", mapOf(
+                "template/simple/dict/matchOrdered.wrongOrder.json5", MapUtils.mapOf(
                         "key", "value"
                         , "key3", "value3"
                         , "keyMatch", "value2"
@@ -62,7 +63,7 @@ class TemplateMatchKeyTest {
     void matchEmptyFail() throws IOException {
         checkFail("{ key: 'value' }",
                 "{ }",
-                mapOf());
+                MapUtils.mapOf());
     }
 
 }

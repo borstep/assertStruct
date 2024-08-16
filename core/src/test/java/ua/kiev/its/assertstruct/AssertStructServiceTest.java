@@ -2,17 +2,18 @@ package ua.kiev.its.assertstruct;
 
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
+import ua.kiev.its.assertstruct.service.AssertStructService;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kiev.its.assertstruct.TestUtils.mapOf;
+import static ua.kiev.its.assertstruct.utils.MapUtils.mapOf;
 
-class AssertStructTest {
-    AssertStruct assertStruct = AssertStructUtils.getDefault();
+class AssertStructServiceTest {
+    AssertStructService assertStructService = AssertStruct.getDefault();
 
     @Test
     void match() {
         AssertionFailedError ex = assertThrows(AssertionFailedError.class, () ->
-                assertStruct.match("{key:1}"
+                assertStructService.match("{key:1}"
                         , mapOf("key", 2), "Error message")
         );
     }

@@ -1,8 +1,12 @@
 package ua.kiev.its.assertstruct.template;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import ua.kiev.its.assertstruct.AssertStruct;
-import ua.kiev.its.assertstruct.config.KeyFactory;
-import ua.kiev.its.assertstruct.config.NodeFactory;
+import ua.kiev.its.assertstruct.service.AssertStructService;
+import ua.kiev.its.assertstruct.service.Config;
+import ua.kiev.its.assertstruct.service.KeyParser;
+import ua.kiev.its.assertstruct.service.NodeParser;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.impl.parser.JSon5Parser;
 import ua.kiev.its.assertstruct.impl.validator.TypeCheckValidator;
@@ -15,15 +19,18 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TemplateParser {
-    AssertStruct env;
+    AssertStructService env;
+    Config config;
 
     public TemplateParser() {
-        this(AssertStruct.getDefaultInstance());
+        this(AssertStruct.getDefault());
     }
 
-    public TemplateParser(AssertStruct env) {
+    public TemplateParser(AssertStructService env) {
         this.env = env;
+        this.config = env.getConfig();
     }
 
     public Template parse(JSon5Parser parser) throws IOException {
@@ -103,9 +110,9 @@ public class TemplateParser {
                     typeValidator = createTypeValidator(className);
                 }
             }
-            for (NodeFactory nodeFactory : env.getNodeMatchingFactories()) {
-                if (value.startsWith(nodeFactory.getPrefix())) {
-                    result = nodeFactory.parseNode(value, templateKey, token);
+            for (NodeParser nodeParser : env.getNodeParsers()) {
+                if (value.startsWith(nodeParser.getPrefix())) {
+                    result = nodeParser.parseNode(value, templateKey, token);
                     if (result != null)
                         break;
                 }
@@ -125,7 +132,7 @@ public class TemplateParser {
                 aClass = this.getClass().getClassLoader().loadClass(className);
 
             } else {
-                for (String pack : env.getDefaultPackages()) {
+                for (String pack : config.getDefaultPackages()) {
                     try {
                         aClass = this.getClass().getClassLoader().loadClass(pack + "." + className);
                     } catch (ClassNotFoundException ignore) {
@@ -144,9 +151,9 @@ public class TemplateParser {
     private TemplateKey buildKey(ExtToken keyToken) {
         String key = (String) keyToken.getValue();
         if (!keyToken.isDoubleQuoted()) {
-            for (KeyFactory keyFactory : env.getKeyMatchingFactories()) {
-                if (key.startsWith(keyFactory.getPrefix())) {
-                    TemplateKey templateKey = keyFactory.parseKey(key, keyToken);
+            for (KeyParser keyParser : env.getKeyParsers()) {
+                if (key.startsWith(keyParser.getPrefix())) {
+                    TemplateKey templateKey = keyParser.parseKey(key, keyToken);
                     if (templateKey != null)
                         return templateKey;
                 }

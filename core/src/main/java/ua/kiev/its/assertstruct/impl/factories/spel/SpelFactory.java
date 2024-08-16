@@ -3,39 +3,27 @@ package ua.kiev.its.assertstruct.impl.factories.spel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-import ua.kiev.its.assertstruct.config.KeyFactory;
-import ua.kiev.its.assertstruct.config.NodeFactory;
-import ua.kiev.its.assertstruct.impl.parser.ExtToken;
-import ua.kiev.its.assertstruct.template.TemplateKey;
-import ua.kiev.its.assertstruct.template.TemplateNode;
+import ua.kiev.its.assertstruct.service.AssertStructService;
+import ua.kiev.its.assertstruct.service.Parser;
+import ua.kiev.its.assertstruct.service.ParserFactory;
 
 @FieldDefaults(level = AccessLevel.PROTECTED)
 @Getter
-public class SpelFactory implements KeyFactory, NodeFactory {
-
-    public static final String PREFIX = "#";
-
-    ExpressionParser parser = new SpelExpressionParser();
-    StandardEvaluationContext sharedContext = new StandardEvaluationContext();
+public class SpelFactory implements ParserFactory {
+    public static final ParserFactory INSTANCE = new SpelFactory();
 
     @Override
-    public TemplateKey parseKey(String value, ExtToken token) {
-        Expression expression = parser.parseExpression(value.substring(PREFIX.length()));
-        return new SpelKey(expression, value, token, this);
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
-    }
-
-    @Override
-    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
-        Expression expression = parser.parseExpression(value.substring(PREFIX.length()));
-        return new SpelNode(expression, templateKey, token, this);
+    public Parser buildParser(AssertStructService assertStructService) {
+        try {
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            classLoader.loadClass("org.springframework.expression.spel.standard.SpelExpressionParser");
+            Class<?> spelFactoryClass = classLoader.loadClass("ua.kiev.its.assertstruct.impl.factories.spel.SpelParser");
+            SpelParser spelFactory = (SpelParser) spelFactoryClass.newInstance();
+            return spelFactory;
+        } catch (ClassNotFoundException ignore) { // Doesn't register if spring not found
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 }

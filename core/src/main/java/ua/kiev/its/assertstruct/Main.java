@@ -15,6 +15,9 @@ import static ua.kiev.its.assertstruct.utils.ResourceUtils.resAsStr;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+    }
+
+    public static void main2(String[] args) throws IOException {
         URL resource = Main.class.getClassLoader().getResource("examples/json5.json5");
         System.out.println(resource);
         InputStream x = resource.openStream();
@@ -36,7 +39,7 @@ public class Main {
     }
 
     public static final void parseJson5() throws IOException {
-        JSon5Parser parser = new JSon5Parser(resAsStr("examples/json5.json5").toCharArray(), new AssertStruct());
+        JSon5Parser parser = new JSon5Parser(resAsStr("examples/json5.json5").toCharArray());
         ExtToken token = parser.next();
         StringBuilder sb = new StringBuilder();
         while (token != null) {

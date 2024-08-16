@@ -1,5 +1,5 @@
 {
-  $config: {
+  $opt: {
     "ordered": true
   },
   key: 'value'

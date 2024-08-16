@@ -1,7 +1,7 @@
 package ua.kiev.its.assertstruct.impl.factories.variable;
 
 import lombok.Value;
-import ua.kiev.its.assertstruct.config.ConstantService;
+import ua.kiev.its.assertstruct.service.ConstantService;
 import ua.kiev.its.assertstruct.impl.factories.variable.matcher.AnyList;
 import ua.kiev.its.assertstruct.impl.factories.variable.matcher.AnyObject;
 import ua.kiev.its.assertstruct.matcher.ValueMatcher;

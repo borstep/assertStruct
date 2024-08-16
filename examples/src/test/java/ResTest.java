@@ -4,7 +4,7 @@ import ua.kiev.its.assertstruct.Res;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ua.kiev.its.assertstruct.AssertStructUtils.assertStruct;
+import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
 
 public class ResTest {
     Res POJO = Res.from("example/pojo.json5");

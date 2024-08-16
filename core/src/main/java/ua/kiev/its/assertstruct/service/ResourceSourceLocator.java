@@ -1,4 +1,4 @@
-package ua.kiev.its.assertstruct.config;
+package ua.kiev.its.assertstruct.service;
 
 import ua.kiev.its.assertstruct.utils.ResourceLocation;
 

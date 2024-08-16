@@ -3,7 +3,7 @@ package ua.kiev.its.assertstruct.template.node;
 import lombok.AccessLevel;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
-import ua.kiev.its.assertstruct.impl.config.ConfigTemplateNode;
+import ua.kiev.its.assertstruct.impl.opt.OptionsNode;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.template.*;
 
@@ -41,7 +41,7 @@ public class ArrayNode extends LinkedList<TemplateNode> implements StructTemplat
     @Override
     public boolean add(TemplateNode node) {
         if (node.isConfig()) {
-            ConfigTemplateNode configNode = (ConfigTemplateNode) node;
+            OptionsNode configNode = (OptionsNode) node;
             if (configNode.isSubTree()) {
                 shared.addSubtreeConfig(configNode.getName(), configNode);
             } else {

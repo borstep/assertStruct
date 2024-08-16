@@ -3,9 +3,8 @@ package ua.kiev.its.assertstruct.template;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import ua.kiev.its.assertstruct.AssertStruct;
+import ua.kiev.its.assertstruct.service.AssertStructService;
 import ua.kiev.its.assertstruct.matcher.Matcher;
-import ua.kiev.its.assertstruct.result.MatchResult;
 import ua.kiev.its.assertstruct.result.RootResult;
 import ua.kiev.its.assertstruct.template.node.ArrayNode;
 import ua.kiev.its.assertstruct.template.node.ObjectNode;
@@ -19,13 +18,13 @@ public class Template {
     @Getter
     TemplateNode root;
     @Getter
-    AssertStruct env;
+    AssertStructService env;
 
-    public Template(TemplateNode root, AssertStruct env) {
+    public Template(TemplateNode root, AssertStructService env) {
         this.root = root;
         this.env = env;
         if (root instanceof StructTemplateNode) {
-            ((StructTemplateNode) root).sealConfigs(env.getSubtreeConfig());
+            ((StructTemplateNode) root).sealConfigs(env.getSubtreeOptions());
         }
     }
 
@@ -38,13 +37,9 @@ public class Template {
     }
 
     public String asString() {
-        try {
-            StringBuilder out = new StringBuilder();
-            root.print(out, false, false, 0, false);
-            return out.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        StringBuilder out = new StringBuilder();
+        root.print(out, false, false, 0, false);
+        return out.toString();
     }
 
     StructTemplateNode asStruct() {

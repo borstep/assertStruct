@@ -1,31 +1,31 @@
-package ua.kiev.its.assertstruct.impl.config;
+package ua.kiev.its.assertstruct.impl.opt;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ua.kiev.its.assertstruct.config.ConfigBuilder;
+import ua.kiev.its.assertstruct.opt.OptionsBuilder;
 
 
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
-public class NodeConfig extends SubtreeConfig {
+public class NodeOptions extends SubtreeOptions {
 
     boolean ordered;
 
-    public NodeConfig(boolean ordered, boolean orderedDicts, boolean orderedLists, boolean ignoreUnknown) {
+    public NodeOptions(boolean ordered, boolean orderedDicts, boolean orderedLists, boolean ignoreUnknown) {
         super(orderedDicts, orderedLists, ignoreUnknown);
         this.ordered = ordered;
     }
 
     @Data
-    public static class NodeConfigBuilder implements ConfigBuilder {
-        private static final NodeConfigBuilder DEFAULT_BUILDER = new NodeConfigBuilder();
+    public static class NodeOptionsBuilder implements OptionsBuilder {
+        private static final NodeOptionsBuilder DEFAULT_BUILDER = new NodeOptionsBuilder();
         Boolean ordered;
         Boolean ignoreUnknown;
 
         @Override
-        public NodeConfigBuilder set(String name, Object value) {
+        public NodeOptionsBuilder set(String name, Object value) {
             if (name.equals("ordered")) {
                 ordered = (Boolean) value;
             } else if (name.equals("ignoreUnknown")) {
@@ -36,15 +36,15 @@ public class NodeConfig extends SubtreeConfig {
             return this;
         }
 
-        public NodeConfig build(SubtreeConfig parent, boolean isDict) {
-            return new NodeConfig(
+        public NodeOptions build(SubtreeOptions parent, boolean isDict) {
+            return new NodeOptions(
                     ordered == null ? (isDict ? parent.orderedDicts : parent.orderedLists) : ordered,
                     parent.orderedDicts,
                     parent.orderedLists,
                     ignoreUnknown == null ? parent.ignoreUnknown : ignoreUnknown);
         }
 
-        public static NodeConfig buildDefault(SubtreeConfig parent, boolean isDict) {
+        public static NodeOptions buildDefault(SubtreeOptions parent, boolean isDict) {
             return DEFAULT_BUILDER.build(parent, isDict);
         }
     }

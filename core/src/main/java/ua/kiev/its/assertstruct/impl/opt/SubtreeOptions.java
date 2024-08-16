@@ -1,31 +1,31 @@
-package ua.kiev.its.assertstruct.impl.config;
+package ua.kiev.its.assertstruct.impl.opt;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ua.kiev.its.assertstruct.config.ConfigBuilder;
+import ua.kiev.its.assertstruct.opt.OptionsBuilder;
 
 @Getter
 @ToString
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-public class SubtreeConfig {
+public class SubtreeOptions {
     boolean orderedDicts;
     boolean orderedLists;
     boolean ignoreUnknown;
 
-    public static SubtreeConfigBuilder builder() {
-        return new SubtreeConfigBuilder();
+    public static SubtreeOptionsBuilder builder() {
+        return new SubtreeOptionsBuilder();
     }
 
     @Data
-    public static class SubtreeConfigBuilder implements ConfigBuilder {
+    public static class SubtreeOptionsBuilder implements OptionsBuilder {
         Boolean orderedDicts;
         Boolean orderedLists;
         Boolean ignoreUnknown;
 
         @Override
-        public NodeConfig.NodeConfigBuilder set(String name, Object value) {
+        public NodeOptions.NodeOptionsBuilder set(String name, Object value) {
             if (name.equals("orderedDicts")) {
                 orderedDicts = (Boolean) value;
             } else if (name.equals("orderedLists")) {
@@ -38,8 +38,8 @@ public class SubtreeConfig {
             return null;
         }
 
-        public SubtreeConfig build(SubtreeConfig parent) {
-            return new SubtreeConfig(
+        public SubtreeOptions build(SubtreeOptions parent) {
+            return new SubtreeOptions(
                     orderedDicts == null ? parent.orderedDicts : orderedDicts,
                     orderedLists == null ? parent.orderedLists : orderedLists,
                     ignoreUnknown == null ? parent.ignoreUnknown : ignoreUnknown);

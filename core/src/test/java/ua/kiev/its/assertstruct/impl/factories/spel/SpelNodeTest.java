@@ -5,12 +5,10 @@ import org.opentest4j.AssertionFailedError;
 import ua.kiev.its.assertstruct.Res;
 import ua.kiev.its.assertstruct.template.Template;
 import ua.kiev.its.assertstruct.template.TemplateNode;
-
-import java.util.HashMap;
+import ua.kiev.its.assertstruct.utils.MapUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ua.kiev.its.assertstruct.AssertStructUtils.*;
-import static ua.kiev.its.assertstruct.TestUtils.*;
+import static ua.kiev.its.assertstruct.AssertStruct.*;
 
 public class SpelNodeTest {
     @Test
@@ -23,13 +21,13 @@ public class SpelNodeTest {
 
     @Test
     void matchOK() {
-        assertStruct("{ fields: '#size()+1' }", mapOf("fields", 2));
+        assertStruct("{ fields: '#size()+1' }", MapUtils.mapOf("fields", 2));
     }
 
     @Test
     void matchFail() {
         AssertionFailedError assertionFailedError = assertThrows(AssertionFailedError.class,
-                () -> assertStruct("{ fields: '#size()+1' }", mapOf("fields", 3)));
+                () -> assertStruct("{ fields: '#size()+1' }", MapUtils.mapOf("fields", 3)));
         assertEquals("{ fields: 3 }", assertionFailedError.getActual().getValue());
     }
 

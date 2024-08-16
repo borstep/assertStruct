@@ -1,5 +1,5 @@
 {
-  '$config.ordered': true,
+  '$opt.ordered': true,
   key: 'value',
   '$/.+Match/': 'value2',
   key3: 'value3'

@@ -26,7 +26,7 @@ public class JacksonConverter implements JsonConverter {
     public JacksonConverter() {
         baseMapper = new ObjectMapper();
         baseMapper.registerModule(new JavaTimeModule());// TODO make configurable
-        baseMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        baseMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
         mapper = baseMapper.copy();
         com.fasterxml.jackson.databind.Module module = new com.fasterxml.jackson.databind.Module() {
             @Override

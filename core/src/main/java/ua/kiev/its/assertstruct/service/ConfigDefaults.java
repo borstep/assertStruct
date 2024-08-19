@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.UtilityClass;
 import ua.kiev.its.assertstruct.impl.factories.any.ShortAnyParser;
 import ua.kiev.its.assertstruct.impl.factories.array.RepeaterParser;
-import ua.kiev.its.assertstruct.impl.factories.date.AnyDateFactory;
+import ua.kiev.its.assertstruct.impl.factories.date.DateFactory;
 import ua.kiev.its.assertstruct.impl.factories.regexp.RegexpParser;
 import ua.kiev.its.assertstruct.impl.factories.spel.SpelFactory;
 import ua.kiev.its.assertstruct.impl.factories.variable.ConstantParser;
@@ -27,7 +27,7 @@ public class ConfigDefaults {
             ShortAnyParser.INSTANCE,
             RegexpParser.INSTANCE,
             SpelFactory.INSTANCE,
-            AnyDateFactory.INSTANCE
+            DateFactory.INSTANCE
     );
 
     static List<String> DEFAULT_SRC_PATHS = Arrays.asList(

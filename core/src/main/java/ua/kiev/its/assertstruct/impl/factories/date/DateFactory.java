@@ -6,26 +6,32 @@ import ua.kiev.its.assertstruct.service.ParserContainer;
 import ua.kiev.its.assertstruct.service.ParserFactory;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AnyDateFactory implements ParserFactory {
-    public static final AnyDateFactory INSTANCE = new AnyDateFactory();
+public class DateFactory implements ParserFactory {
+    public static final DateFactory INSTANCE = new DateFactory();
+
     @Override
     public Parser buildParser(AssertStructService env) {
 
+        List<DateTimeFormatter> dateTimeFormatters = buildFormatters(env.getConfig().getDateTimeFormats());
         return new ParserContainer(Arrays.asList(
                 new AnyDateParser(buildFormatters(env.getConfig().getDateFormats()), "$ANY_DATE"),
-                new AnyDateParser(buildFormatters(env.getConfig().getDateTimeFormats()), "$ANY_DATETIME"),
-                new AnyDateParser(buildFormatters(env.getConfig().getTimeFormats()), "$ANY_TIME")
+                new AnyDateParser(dateTimeFormatters, "$ANY_DATETIME"),
+                new AnyDateParser(buildFormatters(env.getConfig().getTimeFormats()), "$ANY_TIME"),
+                new NowParser(env.getConfig().getNowPrecision()*1000, dateTimeFormatters, env.getConfig().isNowStrictCheck()),
+                new DateParser()
         ));
     }
 
-    static List<DateTimeFormatter> buildFormatters(List<String> formats) {
+    public static List<DateTimeFormatter> buildFormatters(List<String> formats) {
         return formats
                 .stream()
                 .map(DateTimeFormatter::ofPattern)
+                .map(f->f.withResolverStyle(ResolverStyle.STRICT))
                 .collect(Collectors.toList());
     }
 }

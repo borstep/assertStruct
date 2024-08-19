@@ -246,12 +246,12 @@ means any value assignable to java.lang.Number
 | $*                 | Any value             | Includes all types, Maps, Lists, null, etc.                                     | [x] |      |
 | ${*}               | Any Object            | Includes Maps, Objects, etc.                                                    |     |      |
 | $[*]               | Any List              | Include collections and arrays                                                  |     |      |
-| $NOW               | Current date          | Compare with current date with default precision (1 min)                        |     | -    |
-| $NOW(n)            | Current date          | Compare with current date with precision of n second                            |     | -    |
+| $NOW               | Current date          | Compare with current date with default precision (1 min)                        |     |      |
+| $NOW(n)            | Current date          | Compare with current date with precision of n second                            |     |      |
 | $ANY_DATE          | Any date              | Value can be parsed as date with time using default format                      |     |      |
 | $ANY_DATETIME      | Any date time         | Value can be parsed as date using default format                                |     |      |
 | $ANY_TIME          | Any time              | Value can be parsed as time using default format                                |     |      |
-| $DATE(xxx)         | Any time              | Value can be parsed as date or time using format 'xxx'                          |     | -    |
+| $DATE(xxx)         | Any time              | Value can be parsed as date or time using format 'xxx'                          |     |      |
 | $/regexp/          | Regexp                | Value matched by regular expression                                             | [x] |      |
 | $.name1.method1()  | Simple evaluator      | Calculate value of field, property or no-arg method                             | [x] | -    |
 | #expresion         | Calculate expression  | Calculate complex expression using external library. By default SpEL. optional  | [x] |      |

@@ -1,5 +1,6 @@
 package ua.kiev.its.assertstruct.impl.factories.date;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import ua.kiev.its.assertstruct.impl.parser.ExtToken;
 import ua.kiev.its.assertstruct.matcher.Matcher;
@@ -10,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Value
+@EqualsAndHashCode(callSuper = false)
 public class AnyDateNode extends ScalarNode {
     List<DateTimeFormatter> formatters;
 
@@ -20,6 +22,9 @@ public class AnyDateNode extends ScalarNode {
 
     @Override
     public boolean match(Object value, Matcher context) {
+        if (value == null) {
+            return false;
+        }
         for (DateTimeFormatter formatter : formatters) {
             try {
                 formatter.parse(value.toString());

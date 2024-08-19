@@ -56,7 +56,7 @@ public class Config {
     @Builder.Default
     int indent = 2;
     @Builder.Default
-    JsonFactory json5Factory = ConfigDefaults.buildDefaultJson5Factory();
+    JsonFactory json5Factory = buildDefaultJson5Factory();
     @Builder.Default
     JsonConverter jsonConverter = new JacksonConverter();
     @Singular
@@ -69,6 +69,14 @@ public class Config {
     String target = "target";
     @Singular
     List<String> targetPaths; // defaults in builder
+    @Builder.Default
+    private boolean nowStrictCheck=true;
+
+    /**
+     * $NOW precision in seconds
+     */
+    @Builder.Default
+    private int nowPrecision = 60;
 
     public static class ConfigBuilder {
         ConfigBuilder() {

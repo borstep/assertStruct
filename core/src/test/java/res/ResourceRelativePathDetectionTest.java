@@ -2,7 +2,7 @@ package res;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ua.kiev.its.assertstruct.Res;
+import org.assertstruct.Res;
 
 class ResourceRelativePathDetectionTest {
 

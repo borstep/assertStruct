@@ -16,7 +16,7 @@ In case of failure, the difference will be transformed into a simple text presen
 
 # AssertStruct in 30 sec
 ```java
-import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
+import static org.assertstruct.AssertStruct.assertStruct;
 
 public class PojoTest {
     @Test
@@ -102,7 +102,7 @@ For pre Java15 or complex templated external file will be a better choice, howev
 Maven
 ```xml
         <dependency>
-            <groupId>ua.kiev.its.assertstruct</groupId>
+            <groupId>org.assertstruct</groupId>
             <artifactId>assertstruct-core</artifactId>
             <version>1.0</version>
             <scope>test</scope>
@@ -110,7 +110,7 @@ Maven
 ```
 Usually you will use default configuration of AssertStruct and static method imported from AssertStructUtils.
 ```java
-import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
+import static org.assertstruct.AssertStruct.assertStruct;
 ...
     @Test
     public void inlineTemplateTest() {
@@ -118,7 +118,7 @@ import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
     }
 ```
 AssertStruct use smart detection of file name in expected parameter.
-However, you can use ua.kiev.its.assertstruct.Res class to define template resource.
+However, you can use org.assertstruct.Res class to define template resource.
 This resource can be reused for multiple asserts or even used as simple data loader
 ```java
     Res POJO = Res.from("example/pojo.json5");

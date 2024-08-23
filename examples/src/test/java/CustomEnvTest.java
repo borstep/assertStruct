@@ -1,6 +1,5 @@
 import org.junit.jupiter.api.Test;
-import ua.kiev.its.assertstruct.AssertStruct;
-import ua.kiev.its.assertstruct.service.AssertStructService;
+import org.assertstruct.AssertStruct;
 
 public class CustomEnvTest {
     @Test

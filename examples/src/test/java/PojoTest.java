@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static example.model.ContactType.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ua.kiev.its.assertstruct.AssertStruct.assertStruct;
+import static org.assertstruct.AssertStruct.assertStruct;
 
 
 public class PojoTest {

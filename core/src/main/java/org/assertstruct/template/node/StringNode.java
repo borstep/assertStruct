@@ -1,0 +1,20 @@
+package org.assertstruct.template.node;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+import org.assertstruct.impl.parser.ExtToken;
+import org.assertstruct.template.TemplateKey;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class StringNode extends ValueNode {
+    @Getter
+    char quoteChar = '\"';
+    @Getter
+    boolean multiline = false; // TODO
+
+    public StringNode(TemplateKey key, String value, ExtToken token) {
+        super(key, value, token);
+        quoteChar = token.getQuoteChar();
+    }
+}

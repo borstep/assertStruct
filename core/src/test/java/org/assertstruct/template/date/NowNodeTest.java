@@ -1,21 +1,15 @@
 package org.assertstruct.template.date;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertstruct.AssertStruct;
-import org.assertstruct.impl.converter.jackson.JacksonConverter;
-import org.junit.jupiter.api.Test;
 import org.assertstruct.Res;
 import org.assertstruct.impl.factories.date.NowNode;
 import org.assertstruct.template.Template;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 import static java.time.temporal.ChronoUnit.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertstruct.TestUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NowNodeTest {
     @Test
@@ -32,10 +26,10 @@ public class NowNodeTest {
     }
 
     @Test
-    void assert_Fail() throws JsonProcessingException {
+    void assert_Fail() {
         Instant notNow = Instant.now().minus(900, SECONDS);
-        DateTimeFormatter dtf= DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSX").withZone(ZoneOffset.UTC);
-        checkFail("'$NOW'", "'" + dtf.format(notNow)+"'", notNow);
+//        DateTimeFormatter dtf= DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSX").withZone(ZoneOffset.UTC);
+        checkFail("'$NOW'", "'" + notNow.toString()+"'", notNow);
     }
 
 }

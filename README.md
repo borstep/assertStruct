@@ -111,7 +111,7 @@ Maven
 Usually you will use default configuration of AssertStruct and static method imported from AssertStructUtils.
 ```java
 import static org.assertstruct.AssertStruct.assertStruct;
-...
+
     @Test
     public void inlineTemplateTest() {
         assertStruct("[1,5,3]", new int[]{1,2,3});
@@ -264,11 +264,41 @@ means any value assignable to java.lang.Number
 * Spring Core. Optional, used to calculate complex expression. If not present *#expresion* will throw exceptions  
 
 # Configuration and customization
+## Default configuration
+Most of the configurations can be setup via *assert-struct.properties* file.
+All *assert-struct.properties* in classpath will be loaded and applied to default configuration during the startup. 
+If you have more then one file in classpath loading order can be adjusted via *priority* property in file, lower priority 
+will be loaded earlier, so higher priority will override.
+All properties with simple types from ```org.assertstruct.service.Config.ConfigBuilder``` can be used in *assert-struct.properties* file with prefix ```config.```.
+Any properties with prefix ```ext.``` can be added, and they are reserved as convenient way to set properties for extensions. 
+
+More complicated configurations and extensions can be done via SPI api.
+You must create class implementing `org.assertstruct.service.AssertStructConfigurator` interface
+and add `META-INF/services/org.assertstruct.service.AssertStructConfigurator` with a full qualified name of your class.
+As example `test/java/config/ExampleAssertStructConfigurator.java`:
+```java
+package config;
+
+import org.assertstruct.service.AssertStructConfigurator;
+import org.assertstruct.service.Config;
+import org.assertstruct.service.ConfigDefaults;
+
+public class ExampleAssertStructConfigurator implements AssertStructConfigurator {
+    @Override
+    public Config.ConfigBuilder configure(Config.ConfigBuilder config) {
+        return config;
+    }
+}
+```
+And `test/resources/META-INF/services/org.assertstruct.service.AssertStructConfigurator`:
+```text
+config.ExampleAssertStructConfigurator
+```
 
 **// TODO**
 
 # Status
-The project is under active development. However, implemented part is already working and I inspire anyone to try it.
+The project is under active development. However, implemented part is already working and I inspire everyone to try it.
 Any feedback is welcome. 
 I'm planning to make first release in a few weeks, so if you are considering to use it in production, please go ahead.
 

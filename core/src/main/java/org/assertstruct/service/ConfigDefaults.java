@@ -2,6 +2,7 @@ package org.assertstruct.service;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.core.TSFBuilder;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -48,6 +49,11 @@ public class ConfigDefaults {
             "java.time");
 
     public static JsonFactory buildDefaultJson5Factory() {
+        return defaultJson5FactoryBuilder()
+                .build();
+    }
+
+    public static TSFBuilder<?, ?> defaultJson5FactoryBuilder() {
         return JsonFactory.builder()
                 .enable(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES)
                 .enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
@@ -59,8 +65,7 @@ public class ConfigDefaults {
                 .enable(JsonReadFeature.ALLOW_LEADING_DECIMAL_POINT_FOR_NUMBERS)
                 .enable(JsonReadFeature.ALLOW_TRAILING_DECIMAL_POINT_FOR_NUMBERS)
                 .enable(JsonReadFeature.ALLOW_LEADING_PLUS_SIGN_FOR_NUMBERS)
-                .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
-                .build();
+                .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION);
     }
 
 }

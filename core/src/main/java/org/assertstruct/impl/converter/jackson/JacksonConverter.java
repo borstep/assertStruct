@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.*;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,16 +17,15 @@ import org.assertstruct.converter.JsonConverter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
+@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JacksonConverter implements JsonConverter {
-    @Getter
     ObjectMapper mapper;
-    @Getter
     ObjectMapper baseMapper;
 
     public JacksonConverter() {
         baseMapper = new ObjectMapper();
-        baseMapper.registerModule(new JavaTimeModule());// TODO make configurable
+        baseMapper.registerModule(new JavaTimeModule().enable(JavaTimeFeature.ALWAYS_ALLOW_STRINGIFIED_DATE_TIMESTAMPS));// TODO make configurable
         baseMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
         mapper = baseMapper.copy();
         com.fasterxml.jackson.databind.Module module = new com.fasterxml.jackson.databind.Module() {

@@ -26,7 +26,7 @@ class AssertStructConfigLoaderTest {
     void loadDefaultConfig() {
         Config config = AssertStructConfigLoader.loadDefaultConfig().internalBuildConfig();
         assertArrayEquals("uuuu-MM-dd".split(","), config.getDateFormats().toArray());
-        assertArrayEquals("uuuu-MM-dd'T'HH:mm:ss.SSSX,uuuu-MM-dd'T'HH:mm:ss,uuuu-MM-dd'T'HH:mm:ss.SSS".split(","), config.getDateTimeFormats().toArray());
+        assertArrayEquals("uuuu-MM-dd'T'HH:mm:ss.SSSX,uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSX,uuuu-MM-dd'T'HH:mm:ss,uuuu-MM-dd'T'HH:mm:ss.SSS".split(","), config.getDateTimeFormats().toArray());
     }
 
 }

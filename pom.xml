@@ -6,14 +6,14 @@
 
     <groupId>org.assertstruct</groupId>
     <artifactId>assertstruct-root</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>AssertStruct</name>
+    <name>assertStruct</name>
     <description>AssertStruct is a library to simplify validating complex data structure including hierarchy of POJO
         objects.
     </description>
-    <url>https://github.com/your-github-username/assertstruct</url>
+    <url>https://github.com/borstep/assertStruct</url>
     <inceptionYear>2024</inceptionYear>
 
     <licenses>
@@ -28,9 +28,27 @@
         <developer>
             <id>borstep</id>
             <name>Boris Stepchenko</name>
-            <email>borstep@gmail.com</email>
+            <email>assertstruct@gmail.com</email>
+            <organization>InfoTechnoService Ltd</organization>
+            <organizationUrl>https://www.its.kiev.ua</organizationUrl>
         </developer>
     </developers>
+    <scm>
+        <connection>scm:git:git://github.com/borstep/assertStruct.git</connection>
+        <developerConnection>scm:git:ssh://github.com:borstep/assertStruct.git</developerConnection>
+        <url>https://github.com/borstep/assertStruct/tree/main</url>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>central</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>central</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -69,19 +87,63 @@
     </build>
     <profiles>
         <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.8.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.5.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>sign</id>
+<!--            <activation>-->
+<!--                <property>-->
+<!--                    <name>performRelease</name>-->
+<!--                    <value>true</value>-->
+<!--                </property>-->
+<!--            </activation>-->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.4</version>
+<!--                        <version>3.2.4</version>-->
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -89,6 +151,9 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <keyname>borstep@gmail.com</keyname>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

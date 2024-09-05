@@ -18,7 +18,7 @@ public class AssertStructConfigLoader {
     public static final String EXT_PREFIX = "ext.";
     public static final String CONFIG_PREFIX = "config.";
     private static final Map<Class<?>, Function<String, Object>> convertors = initConvertors();
-    private static final Map<String, Setter> setters = initPropertySetter();
+    static final Map<String, Setter> setters = initPropertySetter();
 
     public static AssertStructService loadDefaultService() {
         return loadDefaultConfig().build();

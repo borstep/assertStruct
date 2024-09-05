@@ -47,6 +47,11 @@ For more complex objects it's even more fascinating. In combination with *Consol
 Diff row will be transformed to a link which open diff editor for pojo.json5 file.
 ![Inline diff](./docs/media/pojo.png)
 
+Don't use IDEA - no problem. In the console, you can see the full path to test source and actual value.
+Open them in any diff tool you like. Also, if your template has a lot of masked values, it can be useful
+to look at the unmasked variant, JSON5-serialized version of the actual value is stored in a separate file.
+
+More examples can be found in the [examples](./examples) folder.
 
 # Motivation
 There are many great libraries to validate complex Java objects. However, they are often missing 2 points: 
@@ -99,12 +104,12 @@ For pre Java15 or complex templated external file will be a better choice, howev
 
 
 # Usage
-Maven
+#### Maven
 ```xml
         <dependency>
             <groupId>org.assertstruct</groupId>
             <artifactId>assertstruct-core</artifactId>
-            <version>1.0</version>
+            <version>0.9.0</version>
             <scope>test</scope>
         </dependency>
 ```
@@ -123,7 +128,7 @@ This resource can be reused for multiple asserts or even used as simple data loa
 ```java
     Res POJO = Res.from("example/pojo.json5");
     Res INLINE = Res.of("[1,2,3]");
-    Res AUTO_DETECT = Res.of("{key: 'value'}");
+    Res AUTO_DETECT = Res.res("{key: 'value'}");
 
     @Test
     public void assertTest() {
@@ -142,10 +147,17 @@ This resource can be reused for multiple asserts or even used as simple data loa
         assertEquals(data.get("key"), "value");
     }
 ```
-#### TODO Custom config  
+#### Custom config  
 If shared, default configuration does not work for you, it is possible to create custom configuration of AssertStruct service class
 ```java
-// TODO
+    @Test
+public void assertCustom() {
+    AssertStruct
+            .with()
+            .defaultOrderedLists(false)
+            .build()
+            .match("[1,3,2]", new int[]{1, 2, 3});
+}
 ```
 
 # Template format
@@ -175,11 +187,11 @@ For example:
 This template represent dictionary with single key ```"a"``` and with any value.
 
 #### Single and double quotes.
-In many cases JSON5 format require quotes and you can use single or double. 
+In many cases JSON5 format require quotes, and you can use single or double. 
 However, in **double-quoted** strings **all patterns will be ignored**.
 Because single quote is simpler to use in Java strings, it is recommended to use single quote where possible. 
 #### Comments 
-JSON5 format allow single and multiline comments. Library try to detect which comment applied to which field and will try to preserve it's position.
+JSON5 format allow single and multiline comments. Library try to detect which comment applied to which field and will try to preserve its position.
 ```json5
 {
   a: 1, // This is comment for field 'a'
@@ -199,7 +211,7 @@ In case of failure template properties order will be preserved. Additional prope
 However this can be changed by inline configuration
 ```json5
 {
-  '$conf': {
+  '$opt': {
     ignoreUnknown: true,
     ordered: true
   }
@@ -212,12 +224,13 @@ or in shorter form
   '$opt.ordered': true,
 }
 ```
-There 2 types patterns in keys are supported:
+There 2 pattern types in keys are supported:
 * Matchers - will select one or multiple keys from actual value dictionary. For example regular expression
-* Evaluator ???? - will calculate a new value and then will try to match this value to corespondent value in template. For example size, or length methods.    
-#### Arrays | Lists 
-By default, elements of array are ordered and each element of array must be matched to corespondent element in template.
-This can be changed by inline configuration, because keys are not allowed in array eac configuration must be presented as special string element in array.
+* Evaluator - will calculate a new value and then will try to match this value to corespondent value in template. For example size, or length methods.
+
+#### Arrays | Lists | Collections 
+By default, array elements are ordered, and each array element must be matched to a corresponding template element.
+This can be changed by inline configuration. Because keys are not allowed in arrays, each configuration must be presented as a special string element of the array.
 ```json5
 [
   '$opt.ordered: true',
@@ -228,34 +241,87 @@ For example:
 ```json5
 [1,2,'$...']
 ```
-means array which is started from '1' and '2' and then contains zero ore more '2' elements
+means array which is started from '1' and '2' and then contains zero or more '2' elements
 ### Type check
 It is possible to add type validation to any value matcher. 
 In format *'<pattern> ::FullQualifiedClassName'* or in short form *'<pattern> ::className'*
-if it is only class name, then class will be searched in configured list of packages. By default, java.lang and java.util.
+if it is only class name, then class will be searched in configured list of packages. 
+By default, `java.lang`, `java.util` and `java.time` packages will be searched. Can be configured in properties file.
+
 For example:
 ```json5
 '$* ::Number'
 ```
-means any value assignable to java.lang.Number 
+This means any value assignable to java.lang.Number 
 
 ### Matchers
 
-| Pattern            | Description           | Note                                                                            | Key | Impl |
-|--------------------|-----------------------|---------------------------------------------------------------------------------|-----|------| 
-| $*                 | Any value             | Includes all types, Maps, Lists, null, etc.                                     | [x] |      |
-| ${*}               | Any Object            | Includes Maps, Objects, etc.                                                    |     |      |
-| $[*]               | Any List              | Include collections and arrays                                                  |     |      |
-| $NOW               | Current date          | Compare with current date with default precision (1 min)                        |     |      |
-| $NOW(n)            | Current date          | Compare with current date with precision of n second                            |     |      |
-| $ANY_DATE          | Any date              | Value can be parsed as date with time using default format                      |     |      |
-| $ANY_DATETIME      | Any date time         | Value can be parsed as date using default format                                |     |      |
-| $ANY_TIME          | Any time              | Value can be parsed as time using default format                                |     |      |
-| $DATE(xxx)         | Any time              | Value can be parsed as date or time using format 'xxx'                          |     |      |
-| $/regexp/          | Regexp                | Value matched by regular expression                                             | [x] |      |
-| $.name1.method1()  | Simple evaluator      | Calculate value of field, property or no-arg method                             | [x] | -    |
-| #expresion         | Calculate expression  | Calculate complex expression using external library. By default SpEL. optional  | [x] |      |
-|                    |                       |                                                                                 |     |      |
+| Pattern            | Description           | Note                                                                            | Key[^1] | Impl |
+|--------------------|-----------------------|---------------------------------------------------------------------------------|---------|------| 
+| $*                 | Any value             | Includes all types, Maps, Lists, null, etc.                                     | +       |      |
+| ${*}               | Any Object            | Includes Maps, Objects, etc.                                                    |         |      |
+| $[*]               | Any List              | Include collections and arrays                                                  |         |      |
+| $NOW               | Current date          | Compare with current date with default precision (1 min)                        |         |      |
+| $NOW(n)            | Current date          | Compare with current date with precision of n second                            |         |      |
+| $ANY_DATE          | Any date              | Value can be parsed as date with time using default format                      |         |      |
+| $ANY_DATETIME      | Any date time         | Value can be parsed as date using default format                                |         |      |
+| $ANY_TIME          | Any time              | Value can be parsed as time using default format                                |         |      |
+| $DATE(xxx)         | Any time              | Value can be parsed as date or time using format 'xxx'                          |         |      |
+| $/regexp/          | Regexp                | Value matched by regular expression                                             | +       |      |
+| $.name1.method1()  | Simple evaluator      | Calculate value of field, property or no-arg method                             | +       | -    |
+| #expresion         | Calculate expression  | Calculate complex expression using external library. By default SpEL. optional  | +       |      |
+|                    |                       |                                                                                 |         |      |
+
+> [^1]: Key column mark Matchers which can be used in keys
+ 
+
+### POJO support
+When actual value is not a 'JSON compatible' type it will be converted to using JsonConverter class.
+> JSON compatible structure is an object where each property is or simple type (string, number, boolean) or Collection or Map or null.
+Usually during conversion all entries are wrapped in ```org.assertstruct.converter.Wrapper```, which give access to initial value.
+
+This is a lazy operation and will be executed only when needed.
+For example if actual value is:
+```json5
+[
+    1,
+    2,
+    {
+        pojoObject: {} // some Java object
+    }
+]
+```
+And it matched to the template:
+```json5
+[1, 2, '$*']
+```
+pojoObject will be not converted to JSON, because it is not actually used for matching. However, if matching will fail,
+all entries will be converted to be able to build the expected result.
+
+
+There are 2 implementations available: Jackson and Dummy.
+#### JacksonConverter
+Jackson implementation is optional, and if you want to use it, you need to add jackson-databind and required jackson-datatype-* dependencies explicitly. 
+However, it is recommended to use. And if jackson-binding are available in class path it will be automatically used.
+Also, if available, JavaTimeModule will be registered.
+##### Jackson configuration
+There are some properties which can be configured via *assert-struct.properties* using prefix ```ext.jackson.` prefix:
+
+| Property                | Description                                                           |
+|-------------------------|-----------------------------------------------------------------------|
+| ext.jackson.modules     | Coma-separated list of FullQualified class names of Jackson modules.  |
+| ext.jackson.dateFormat  | Default date format to use.                                           |
+
+For more complex configuration it is possible to use SPI 
+providing class which implements ```org.assertstruct.impl.converter.jackson.JacksonConfigurator``` see [SPI](#SPI).
+
+##### Implementation details
+Behind the scene JacksonConverter use logic close to ```Object.convertValue(value, Object.class)```, but without full serialization to TokenBuffer.
+On top of provided  
+
+#### DummyConverter
+Dummy is fallback implementation and will be used if nothing else was not configured.
+For any object it will simply return ```String.valueOf(value)```.
 
 # Requirements
 * Java 8+.
@@ -265,13 +331,18 @@ means any value assignable to java.lang.Number
 
 # Configuration and customization
 ## Default configuration
+### Properties file
 Most of the configurations can be setup via *assert-struct.properties* file.
 All *assert-struct.properties* in classpath will be loaded and applied to default configuration during the startup. 
-If you have more then one file in classpath loading order can be adjusted via *priority* property in file, lower priority 
+If you have more then one file in classpath loading order can be adjusted via `priority` property in file, lower priority 
 will be loaded earlier, so higher priority will override.
 All properties with simple types from ```org.assertstruct.service.Config.ConfigBuilder``` can be used in *assert-struct.properties* file with prefix ```config.```.
 Any properties with prefix ```ext.``` can be added, and they are reserved as convenient way to set properties for extensions. 
+Default values are defined in core module [assert-struct.properties](./core/src/test/resources/assert-struct.properties) file.
+There is full list of [support properties](.docs/properties.md)
 
+
+### SPI
 More complicated configurations and extensions can be done via SPI api.
 You must create class implementing `org.assertstruct.service.AssertStructConfigurator` interface
 and add `META-INF/services/org.assertstruct.service.AssertStructConfigurator` with a full qualified name of your class.
@@ -295,16 +366,28 @@ And `test/resources/META-INF/services/org.assertstruct.service.AssertStructConfi
 config.ExampleAssertStructConfigurator
 ```
 
-**// TODO**
-
 # Status
 The project is under active development. However, implemented part is already working and I inspire everyone to try it.
 Any feedback is welcome. 
 I'm planning to make first release in a few weeks, so if you are considering to use it in production, please go ahead.
 
-License
--------
+# Roadmap
+1. Add more examples
+2. Implement *Simple evaluator* to not fully depend on SpEL
+3. Add support for <, >, <=, >=, between, etc.
+4. Add more SharedValidator like regexp and '$...' as to simplify multiple checks for same field 
+5. Extra template features. Please join [discussion](https://github.com/borstep/assertStruct/discussions) to propose new features.
+6. Better support for IntelliJ IDEA, to be able to open "compare with clipboard" window for inline asserts.
+7. VS Code support
+
+Feel free to ask for new features in [discussion](https://github.com/borstep/assertStruct/discussions).
+
+# License
 AssertStruct is licensed under [Apache 2.0 licence](https://www.apache.org/licenses/LICENSE-2.0).
 
+
 Release notes
-=============
+-------
+
+### 0.9.0
+- Initial release

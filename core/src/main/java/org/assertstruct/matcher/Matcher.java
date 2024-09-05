@@ -72,7 +72,7 @@ public class Matcher {
         } else if (value instanceof Collection) {
             return new ListWrapper((Collection) value);
         } else {
-            return config.getJsonConverter().pojo2json(value);
+            return env.getJsonConverter().pojo2json(value);
         }
     }
 

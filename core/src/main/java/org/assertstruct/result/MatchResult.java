@@ -5,7 +5,7 @@ import org.assertstruct.template.TemplateNode;
 public interface MatchResult<T extends TemplateNode> {
     boolean hasDifference();
 
-    T getMatchedTo();
+    TemplateNode getMatchedTo();
 
     default boolean isConfig() {
         return false;

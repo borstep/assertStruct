@@ -1,5 +1,8 @@
-package org.assertstruct.service;
+package org.assertstruct.service.exceptions;
 
+/**
+ * Error happened during assertStruct initialization
+ */
 public class InitializationFailure extends RuntimeException{
     public InitializationFailure() {
     }

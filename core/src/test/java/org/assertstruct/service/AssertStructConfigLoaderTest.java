@@ -1,5 +1,7 @@
 package org.assertstruct.service;
 
+import org.assertstruct.converter.JsonConverter;
+import org.assertstruct.impl.converter.jackson.JacksonConverter;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -27,6 +29,15 @@ class AssertStructConfigLoaderTest {
         Config config = AssertStructConfigLoader.loadDefaultConfig().internalBuildConfig();
         assertArrayEquals("uuuu-MM-dd".split(","), config.getDateFormats().toArray());
         assertArrayEquals("uuuu-MM-dd'T'HH:mm:ss.SSSX,uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSX,uuuu-MM-dd'T'HH:mm:ss,uuuu-MM-dd'T'HH:mm:ss.SSS".split(","), config.getDateTimeFormats().toArray());
+    }
+
+    @Test
+    void jacksonConfig_OK() {
+        Config config = AssertStructConfigLoader.loadDefaultConfig().internalBuildConfig();
+        AssertStructService service = new AssertStructService(config);
+        JsonConverter jsonConverter = service.getJsonConverter();
+        assertInstanceOf(JacksonConverter.class, jsonConverter);
+        assertSame(service.with().build().getJsonConverter(), jsonConverter);
     }
 
 }

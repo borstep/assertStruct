@@ -3,7 +3,7 @@ import org.assertstruct.AssertStruct;
 
 public class CustomEnvTest {
     @Test
-    public void assertTest() {
+    public void assertCustom() {
         // TODO create example of define custom environment configuration
         AssertStruct
                 .with()

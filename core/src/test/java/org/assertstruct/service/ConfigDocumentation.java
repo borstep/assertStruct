@@ -1,19 +1,27 @@
 package org.assertstruct.service;
 
 import lombok.experimental.UtilityClass;
+import org.assertstruct.AssertStruct;
+import org.apache.commons.beanutils.BeanUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.TreeSet;
 
 @UtilityClass
 public class ConfigDocumentation {
 
-    private static final String FORMAT = "| %-20s | %-60s |\n";
+    private static final String FORMAT = "| %-27s | %-60s | %-20s |\n";
 
     public static void printConfigPropertyList() {
-        System.out.printf(FORMAT, "Property", "Description");
-        System.out.print(String.format(FORMAT, "", "").replace(' ', '-'));
+        System.out.printf(FORMAT, "Property", "Description", "Default value");
+        System.out.print(String.format(FORMAT, "", "", "").replace(' ', '-'));
+        Config config = AssertStruct.getDefault().getConfig();
         for (String name : new TreeSet<>(AssertStructConfigLoader.setters.keySet())) {
-            System.out.printf(FORMAT, name, "");
+            String defaultValue = "";
+            try {
+                defaultValue = BeanUtils.getProperty(config, name);
+            } catch (Exception ignore) {}
+            System.out.printf(FORMAT, name, "", defaultValue);
         }
     }
 

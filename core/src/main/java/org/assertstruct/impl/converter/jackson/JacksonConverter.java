@@ -1,93 +1,63 @@
 package org.assertstruct.impl.converter.jackson;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import com.fasterxml.jackson.databind.type.*;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.assertstruct.converter.JsonConverter;
+import org.assertstruct.service.Config;
+import org.assertstruct.service.exceptions.InitializationFailure;
+import org.assertstruct.service.exceptions.MatchingFailure;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ServiceLoader;
 
+@Slf4j
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JacksonConverter implements JsonConverter {
+    public static final String PROP_PREFIX="jackson.";
+    public static final String PROP_DATE_FORMAT =PROP_PREFIX+"dateFormat";
+    public static final String PROP_MODULES =PROP_PREFIX+"modules";
     ObjectMapper mapper;
     ObjectMapper baseMapper;
 
-    public JacksonConverter() {
-        baseMapper = new ObjectMapper();
-        baseMapper.registerModule(new JavaTimeModule().enable(JavaTimeFeature.ALWAYS_ALLOW_STRINGIFIED_DATE_TIMESTAMPS));// TODO make configurable
-        baseMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
-        mapper = baseMapper.copy();
-        com.fasterxml.jackson.databind.Module module = new com.fasterxml.jackson.databind.Module() {
-            @Override
-            public String getModuleName() {
-                return "JSONIFY";
+    public JacksonConverter(Config config) {
+        ObjectMapper baseMapper = buildBaseMapper(config);
+        baseMapper=configure(baseMapper);
+        this.baseMapper = baseMapper;
+        this.mapper = baseMapper.copy();
+        mapper.registerModule(new JsonifyWrapperModule());
+    }
+
+    private static ObjectMapper buildBaseMapper(Config config) {
+        ObjectMapper baseMapper = new ObjectMapper();
+        if (config.getExt().containsKey(PROP_MODULES)) {
+            String modules = config.getExt().get(PROP_MODULES);
+            for (String module : modules.split(",")) {
+                try {
+                    baseMapper.registerModule(((Class<? extends Module>) Class.forName(module)).newInstance());
+                } catch (ClassNotFoundException e) {
+                    log.warn("Jackson module {} not found", module);
+                } catch (Exception e) {
+                    throw new InitializationFailure("Can't instantiate Jackson module " + module, e);
+                }
             }
+        }
+        if (config.getExt().containsKey(PROP_DATE_FORMAT))
+            baseMapper.setDateFormat(new SimpleDateFormat(config.getExt().get(PROP_DATE_FORMAT)));
+        return baseMapper;
+    }
 
-            @Override
-            public Version version() {
-                return new Version(1, 0, 0, null, null, null);
-            }
-
-            @Override
-            public void setupModule(SetupContext context) {
-                context.addBeanSerializerModifier(new BeanSerializerModifier() {
-/*
-                    @Override
-                    public JsonSerializer<?> modifyKeySerializer(SerializationConfig config, JavaType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return super.modifyKeySerializer(config, valueType, beanDesc, serializer);
-                    }
-
-                    @Override
-                    public JsonSerializer<?> modifyEnumSerializer(SerializationConfig config, JavaType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return super.modifyEnumSerializer(config, valueType, beanDesc, serializer);
-                    }
-*/
-
-                    @Override
-                    public JsonSerializer<?> modifyMapLikeSerializer(SerializationConfig config, MapLikeType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return new WrapperSerializer(serializer);
-                    }
-
-                    @Override
-                    public JsonSerializer<?> modifyMapSerializer(SerializationConfig config, MapType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return new WrapperSerializer(serializer);
-                    }
-
-                    @Override
-                    public JsonSerializer<?> modifyCollectionLikeSerializer(SerializationConfig config, CollectionLikeType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return new WrapperSerializer(serializer);
-                    }
-
-                    @Override
-                    public JsonSerializer<?> modifyCollectionSerializer(SerializationConfig config, CollectionType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return new WrapperSerializer(serializer);
-                    }
-
-                    @Override
-                    public JsonSerializer<?> modifyArraySerializer(SerializationConfig config, ArrayType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return new WrapperSerializer(serializer);
-                    }
-
-                    @Override
-                    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        return new WrapperSerializer(serializer);
-                    }
-
-                });
-            }
-        };
-        mapper.registerModule(module);
+    private static ObjectMapper configure(ObjectMapper mapper) {
+        ServiceLoader<JacksonConfigurator> loader = ServiceLoader.load(JacksonConfigurator.class);
+        for (JacksonConfigurator configurator : loader) {
+            mapper = configurator.configure(mapper);
+        }
+        return mapper;
     }
 
     public Object pojo2jsonBase(Object value) {
@@ -100,7 +70,13 @@ public class JacksonConverter implements JsonConverter {
             mapper.writeValue(generator, value);
             return generator.getRootObject();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MatchingFailure(e);
         }
     }
+
+    @Override
+    public <T> T convert(Object value, Class<T> toValueType) {
+        return getBaseMapper().convertValue(value, toValueType);
+    }
+
 }

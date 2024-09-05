@@ -9,6 +9,7 @@ import org.assertstruct.converter.JsonStruct;
 import org.assertstruct.converter.ListWrapper;
 import org.assertstruct.converter.MapWrapper;
 import org.assertstruct.converter.ValueWrapper;
+import org.assertstruct.service.exceptions.MatchingFailure;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -700,7 +701,7 @@ public class SimpleStructGenerator extends JsonGenerator {
                 writeObject(p.getEmbeddedObject());
                 break;
             default:
-                throw new RuntimeException("Internal error: unexpected token: " + p.currentToken());
+                throw new MatchingFailure("Internal error: unexpected token: " + p.currentToken());
         }
     }
 
@@ -839,7 +840,7 @@ public class SimpleStructGenerator extends JsonGenerator {
                 writeObject(p.getEmbeddedObject());
                 break;
             default:
-                throw new RuntimeException("Internal error: unexpected token: " + t);
+                throw new MatchingFailure("Internal error: unexpected token: " + t);
         }
     }
 
@@ -873,7 +874,7 @@ public class SimpleStructGenerator extends JsonGenerator {
         } else if (type == JsonToken.VALUE_NULL) {
             value = currentValue == null ? null : new ValueWrapper(currentValue, null);
         } else {
-            throw new RuntimeException("Internal error: unexpected token: " + type);
+            throw new MatchingFailure("Internal error: unexpected token: " + type);
         }
         currentStruct.addChild(_writeContext.getCurrentName(), value);
     }
@@ -910,7 +911,7 @@ public class SimpleStructGenerator extends JsonGenerator {
         } else if (type == JsonToken.START_ARRAY) {
             newStruct = new ListWrapper(currentValue());
         } else {
-            throw new RuntimeException("Internal error: unexpected token: " + type);
+            throw new MatchingFailure("Internal error: unexpected token: " + type);
         }
         currentStruct.addChild(_writeContext.getCurrentName(), newStruct);
         resultStack.push(currentStruct);
@@ -922,7 +923,7 @@ public class SimpleStructGenerator extends JsonGenerator {
      */
     protected final void _appendEndMarker(JsonToken type) {
         if (resultStack.isEmpty()) {
-            throw new RuntimeException("Internal error: unexpected token end: " + type);
+            throw new MatchingFailure("Internal error: unexpected token end: " + type);
         }
         currentStruct = resultStack.pop();
     }

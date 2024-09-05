@@ -16,26 +16,18 @@ class JSon5ParserTest {
             "overall"
     })
     void testParseResource(String resName) throws IOException {
-        parse(resName);
-    }
-
-    private void parse(String resName) throws IOException {
         JSon5Parser parser = new JSon5Parser(Res.from("$$/"+resName+".json5").asChars());
         ExtToken token;
         StringBuilder sb = new StringBuilder();
         try {
-            while ((token=parser.next()) != null) {
+            while ((token = parser.next()) != null) {
                 token.printDebug(sb);
             }
         } catch (IOException e) {
-            System.err.println(sb.toString());
-            throw e;
-        } catch (RuntimeException e) {
-            System.err.println(sb.toString());
+            System.err.println(sb);
             throw e;
         }
         Assertions.assertEquals(Res.from("$$/"+resName+".result.txt").asString(), sb.toString());
-
     }
 
 

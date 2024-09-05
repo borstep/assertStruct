@@ -2,6 +2,7 @@ package org.assertstruct.service;
 
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.assertstruct.service.exceptions.InitializationFailure;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -81,13 +82,22 @@ public class AssertStructConfigLoader {
     static Map<Class<?>, Function<String, Object>> initConvertors() {
         Map<Class<?>, Function<String, Object>> convertors = new HashMap<>();
         convertors.put(int.class,Integer::valueOf);
-        convertors.put(Integer .class,Integer::valueOf);
+        convertors.put(Integer.class,Integer::valueOf);
         convertors.put(boolean.class,Boolean::valueOf);
-        convertors.put(Boolean .class,Boolean::valueOf);
-        convertors.put(String .class,(s)->s);
+        convertors.put(Boolean.class,Boolean::valueOf);
+        convertors.put(String.class, (s)->s);
+        convertors.put(Class.class,AssertStructConfigLoader::loadClass);
+
         return convertors;
     }
 
+    private static Class<?> loadClass(String s) {
+        try {
+            return Class.forName(s);
+        } catch (ClassNotFoundException e) {
+            throw new InitializationFailure("Can't load class " + s, e);
+        }
+    }
     static Map<String, Setter> initPropertySetter() {
         HashMap<String, Setter> res = new HashMap<>();
         Class<Config.ConfigBuilder> configBuilderClass = Config.ConfigBuilder.class;

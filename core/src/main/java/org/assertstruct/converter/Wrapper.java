@@ -8,10 +8,10 @@ public interface Wrapper<S, V> {
     @JsonIgnore
     V getValue();
 
-    default Wrapper getChildWrapper(Object key) {
+    default Wrapper<?, ?> getChildWrapper(Object key) {
         Object child = getChild(key);
         if (child instanceof Wrapper) {
-            return (Wrapper) child;
+            return (Wrapper<?, ?>) child;
         }
         throw new IllegalArgumentException("Child "+key+" is not a wrapper");
     }
@@ -19,7 +19,7 @@ public interface Wrapper<S, V> {
     default Object getChildValue(Object key) {
         Object child = getChild(key);
         if (child instanceof Wrapper) {
-            return ((Wrapper) child).getValue();
+            return ((Wrapper<?, ?>) child).getValue();
         }
         return child;
     }

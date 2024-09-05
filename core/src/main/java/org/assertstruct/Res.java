@@ -21,6 +21,11 @@ import java.util.stream.Collectors;
 
 import static org.assertstruct.utils.ResourceUtils.codeLocator;
 
+/**
+ * Class provide comfortable way to work with text data from classpath or strings.
+ * If content is in JSON5 format it can be parsed and provided as {@link Template} or converted to POJO class.
+ * Res class track location of the resource and provide convenient way to load it and transform into other formats.
+ */
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ToString(of = {"resource"})
 public class Res {
@@ -140,11 +145,20 @@ public class Res {
         this.env = env;
     }
 
+    /**
+     * Provides the content of the resource as a string.
+     * @return the content
+     */
     public String asString() {
         checkRead();
         return content;
     }
 
+
+    /**
+     * Provides the content of the resource as a char array.
+     * @return the content
+     */
     public char[] asChars() {
         checkRead();
         return content.toCharArray();
@@ -152,10 +166,11 @@ public class Res {
 
     Template _template = null;
 
-    private ResourceLocation calcSourceLocation() {
-        return env == null ? location : env.lookupSourceLocation(location);
-    }
-
+    /**
+     * Provides the content of the resource as a template.
+     * Template is parsed on the first call and then cached.
+     * @return the template
+     */
     public Template asTemplate() {
         checkRead();
         if (_template == null) {
@@ -169,14 +184,29 @@ public class Res {
         return _template;
     }
 
+    /**
+     * Provides the content of the resource in JSON5 format converted to provided class.
+     * @param type required class
+     * @return converted content
+     * This method will work only if the resource is in JSON5 format and default JSonConverter support this conversion
+     */
+    public <T> T as(Class<T> type) {
+        return env.getJsonConverter().convert(asTemplate().toData(), type);
+    }
+
     private void checkRead() {
         if (content == null) {
             try (BufferedReader inp = new BufferedReader(new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8))) {
                 content = inp.lines().collect(Collectors.joining("\n"));
                 ;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new TemplateParseException(e);
             }
         }
     }
+
+    private ResourceLocation calcSourceLocation() {
+        return env == null ? location : env.lookupSourceLocation(location);
+    }
+
 }

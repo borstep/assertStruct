@@ -8,10 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.assertstruct.AssertionStructFailedError;
 import org.assertstruct.Res;
 import org.assertstruct.converter.JsonConverter;
+import org.assertstruct.converter.JsonConverterFactory;
+import org.assertstruct.impl.converter.dummy.DummyConverter;
 import org.assertstruct.impl.opt.SubtreeOptions;
 import org.assertstruct.result.Json5Printer;
 import org.assertstruct.result.MatchResult;
 import org.assertstruct.result.RootResult;
+import org.assertstruct.service.exceptions.MatchingFailure;
 import org.assertstruct.template.Template;
 import org.assertstruct.utils.ResourceLocation;
 
@@ -20,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.util.Collections;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -31,11 +35,23 @@ import static org.assertstruct.utils.ResourceUtils.*;
 public class AssertStructService implements ResourceSourceLocator {
 
     Config config;
+    JsonConverter jsonConverter;
     SortedSet<KeyParser> keyParsers;
     SortedSet<NodeParser> nodeParsers;
     SubtreeOptions subtreeOptions;
 
     public AssertStructService(Config config) {
+        this.subtreeOptions = new SubtreeOptions(
+                config.isDefaultOrderedDicts(),
+                config.isDefaultOrderedLists(),
+                config.isDefaultIgnoreUnknown()
+        );
+        if (config.getJsonConverter()!=null) {
+            this.jsonConverter=config.getJsonConverter();
+        } else {
+            this.jsonConverter=loadJsonConverter(config.getJsonConverterFactories(), config);
+            config=config.toBuilder().jsonConverter(jsonConverter).internalBuildConfig(); // Hack to share potentially expensive converter
+        }
         this.config = config;
         SortedSet<NodeParser> nodeParsers = new TreeSet<>(ParsingFactoryComparator.INSTANCE);
         SortedSet<KeyParser> keyParsers = new TreeSet<>(ParsingFactoryComparator.INSTANCE);
@@ -52,11 +68,20 @@ public class AssertStructService implements ResourceSourceLocator {
         }
         this.nodeParsers = Collections.unmodifiableSortedSet(nodeParsers);
         this.keyParsers = Collections.unmodifiableSortedSet(keyParsers);
-        this.subtreeOptions = new SubtreeOptions(
-                config.isDefaultOrderedDicts(),
-                config.isDefaultOrderedLists(),
-                config.isDefaultIgnoreUnknown()
-        );
+    }
+
+    private static JsonConverter loadJsonConverter(List<String> jsonConverterFactories, Config config) {
+        for (String jsonConverterClass : jsonConverterFactories) {
+            try {
+                return ((JsonConverterFactory) AssertStructService.class.getClassLoader().loadClass(jsonConverterClass).newInstance())
+                        .build(config);
+            } catch (ClassNotFoundException ignore) {
+            } catch (Exception e) {
+                log.warn("Can't instantiate JSON converter {}.", jsonConverterClass, e);
+            }
+        }
+        log.warn("No JSON converter found use default");
+        return new DummyConverter();
     }
 
     public Config.ConfigBuilder with() {
@@ -176,12 +201,9 @@ public class AssertStructService implements ResourceSourceLocator {
                 out.print(new Json5Printer(this).print(match));
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new MatchingFailure("Can't save matching result into file " + matchFile, e);
         }
     }
 
 
-    public JsonConverter getJsonConverter() {
-        return config.getJsonConverter();
-    }
 }

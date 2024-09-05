@@ -15,10 +15,6 @@ public class AssertStruct {
         return defaultInstance;
     }
 
-    public static void assertStructMatch(String resource, Object actualValue) {
-
-    }
-
     public static void assertStruct(String expected, Object actualValue) {
         StackTraceElement el = codeLocator();
         Res res = Res.res(expected, el, getDefault());
@@ -47,4 +43,15 @@ public class AssertStruct {
     public static Config.ConfigBuilder with() {
         return getDefault().with();
     }
+
+    /**
+     * Set default AssertStructService.
+     * @param instance new default
+     *
+     * This is not thread-safe operation for performance reason. Use with care.
+     */
+    public static void setDefault(AssertStructService instance) {
+        defaultInstance = instance;
+    }
+
 }

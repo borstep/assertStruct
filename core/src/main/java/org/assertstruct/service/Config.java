@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.Singular;
 import lombok.experimental.FieldDefaults;
 import org.assertstruct.converter.JsonConverter;
-import org.assertstruct.impl.converter.jackson.JacksonConverter;
 import org.assertstruct.impl.factories.variable.DefaultConstantService;
+import org.assertstruct.service.exceptions.InitializationFailure;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,8 +57,9 @@ public class Config {
     int indent = 2;
     @Builder.Default
     JsonFactory json5Factory = buildDefaultJson5Factory();
-    @Builder.Default
-    JsonConverter jsonConverter = new JacksonConverter();
+    JsonConverter jsonConverter;
+    @Singular
+    List<String> jsonConverterFactories;
     @Singular
     List<ParserFactory> parserFactories;
     @Builder.Default
@@ -92,7 +93,7 @@ public class Config {
             try {
                 return parserFactory((ParserFactory) Class.forName(className).newInstance());
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new InitializationFailure(e);
             }
         }
 
@@ -119,6 +120,13 @@ public class Config {
         public ConfigBuilder targetPathList(String targetPaths) {
             this.clearTargetPaths();
             return this.targetPaths(Arrays.asList(targetPaths.split(",")));
+        }
+
+        public ConfigBuilder jsonConverterFactoryClasses(String classNames) {
+            String[] classes = classNames.split(",");
+            this.clearJsonConverterFactories();
+            this.jsonConverterFactories(Arrays.asList(classes));
+            return this;
         }
 
         public ConfigBuilder parserFactoryClasses(String classNames) {

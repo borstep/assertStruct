@@ -13,10 +13,10 @@ import lombok.AllArgsConstructor;
 import java.io.IOException;
 
 @AllArgsConstructor
-public class WrapperSerializer extends JsonSerializer<Object> implements ContextualSerializer, ResolvableSerializer {
-    private JsonSerializer _serializer;
+public class WrapperSerializer<T> extends JsonSerializer<T> implements ContextualSerializer, ResolvableSerializer {
+    private JsonSerializer<T> _serializer;
     @Override
-    public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(T value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (gen instanceof SimpleStructGenerator) {
             gen.assignCurrentValue(value);
             if (_serializer instanceof JsonValueSerializer) {
@@ -30,7 +30,8 @@ public class WrapperSerializer extends JsonSerializer<Object> implements Context
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) throws JsonMappingException {
         if (_serializer instanceof ContextualSerializer) {
-            _serializer=((ContextualSerializer)_serializer).createContextual(prov, property);
+            //noinspection unchecked
+            _serializer= (JsonSerializer<T>) ((ContextualSerializer)_serializer).createContextual(prov, property);
         }
         return this;
     }

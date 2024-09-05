@@ -7,7 +7,7 @@ import org.assertstruct.template.TemplateNode;
 
 @Value
 @AllArgsConstructor
-public class ErrorValue implements ErrorResult<TemplateNode> {
+public class ErrorValue implements ErrorResult {
     Object source;
     @Getter
     TemplateNode matchedTo;

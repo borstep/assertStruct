@@ -1,9 +1,7 @@
 package org.assertstruct.template;
 
-import org.junit.jupiter.api.Test;
 import org.assertstruct.utils.MapUtils;
-
-import java.io.IOException;
+import org.junit.jupiter.api.Test;
 
 import static org.assertstruct.TestUtils.*;
 
@@ -11,7 +9,7 @@ class TemplateAnyTest {
 
 
     @Test
-    void dictAnyValueOK() throws IOException {
+    void dictAnyValueOK() {
         checkOK(
                 "template/any/dict/anyValue.json5",
                 MapUtils.mapOf("key", "value")
@@ -19,7 +17,7 @@ class TemplateAnyTest {
     }
 
     @Test
-    void dictAnyKeyOK() throws IOException {
+    void dictAnyKeyOK() {
         checkOK(
                 "template/any/dict/anyKey.json5",
                 MapUtils.mapOf("key", "value", "key1", "value")
@@ -27,7 +25,7 @@ class TemplateAnyTest {
     }
 
     @Test
-    void dictAnyKeyFail() throws IOException {
+    void dictAnyKeyFail() {
         checkFail(
                 "template/any/dict/anyKey.json5",
                 "template/any/dict/anyKey.wrongValue.json5",

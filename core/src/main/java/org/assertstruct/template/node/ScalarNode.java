@@ -4,10 +4,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.assertstruct.service.SharedValidator;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.impl.validator.TypeCheckValidator;
 import org.assertstruct.matcher.ValueMatcher;
+import org.assertstruct.service.SharedValidator;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 

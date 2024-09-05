@@ -2,10 +2,10 @@ package org.assertstruct.result;
 
 import lombok.Getter;
 import org.assertstruct.AssertStruct;
-import org.assertstruct.service.AssertStructService;
-import org.assertstruct.service.Config;
 import org.assertstruct.converter.Wrapper;
 import org.assertstruct.impl.parser.ExtToken;
+import org.assertstruct.service.AssertStructService;
+import org.assertstruct.service.Config;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 import org.assertstruct.template.node.ArrayNode;
@@ -20,12 +20,10 @@ import java.util.Map;
 import static org.assertstruct.utils.ConversionUtils.*;
 
 
+@Getter
 public class Json5Printer {
-    @Getter
     private final AssertStructService env;
-    @Getter
     private final Config config;
-    @Getter
     private final StringBuilder out;
 
     public Json5Printer() {
@@ -69,7 +67,7 @@ public class Json5Printer {
         }
     }
 
-    private void printDict(Map value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
+    private void printDict(Map<?,?> value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
         ObjectNode matchedTo = null;
         if (value instanceof ErrorMap) {
             matchedTo = ((ErrorMap) value).getMatchedTo();
@@ -79,7 +77,7 @@ public class Json5Printer {
         int childIndent = indent + config.getIndent();
         if (!value.isEmpty()) {
 
-            Iterator<Map.Entry> it = value.entrySet().iterator();
+            Iterator<? extends Map.Entry<?, ?>> it = value.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<?, ?> child = it.next();
                 Object childKey = child.getKey();
@@ -94,7 +92,7 @@ public class Json5Printer {
                     out.append(": ");
                 }
                 if (childValue instanceof MatchResult) {
-                    TemplateNode matchedValueNode = ((MatchResult<?>) childValue).getMatchedTo();
+                    TemplateNode matchedValueNode = ((MatchResult) childValue).getMatchedTo();
                     if (matchedValueNode != null) {
                         childEOL = matchedValueNode.getEndToken().isEOLIncluded();
                     }

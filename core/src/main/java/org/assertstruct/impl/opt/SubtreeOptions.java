@@ -26,6 +26,7 @@ public class SubtreeOptions {
 
         @Override
         public NodeOptions.NodeOptionsBuilder set(String name, Object value) {
+            //noinspection IfCanBeSwitch
             if (name.equals("orderedDicts")) {
                 orderedDicts = (Boolean) value;
             } else if (name.equals("orderedLists")) {

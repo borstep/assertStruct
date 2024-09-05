@@ -2,6 +2,7 @@ package org.assertstruct.utils;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.Objects;
 import java.util.Scanner;
 
 @UtilityClass
@@ -13,7 +14,7 @@ public class ResourceUtils {
      * @return content of the resource
      */
     public static String resAsStr(String resource) {
-        return new Scanner(ResourceUtils.class.getClassLoader().getResourceAsStream(resource), "UTF-8").useDelimiter("\\A").next();
+        return new Scanner(Objects.requireNonNull(ResourceUtils.class.getClassLoader().getResourceAsStream(resource)), "UTF-8").useDelimiter("\\A").next();
     }
 
 

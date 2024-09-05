@@ -7,14 +7,13 @@ import org.assertstruct.impl.opt.OptionsKey;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.matcher.Matcher;
 import org.assertstruct.template.*;
-import org.assertstruct.template.*;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ObjectNode extends LinkedHashMap<String, TemplateNode> implements StructTemplateNode, DataNode<Map<String, Object>> {
 
     @Delegate
@@ -48,19 +47,18 @@ public class ObjectNode extends LinkedHashMap<String, TemplateNode> implements S
     /**
      * Look for best template key for actual key
      *
-     * @param actualKey
-     * @param context
-     * @return
+     * @param key key
+     * @param context matcher
+     * @return template node corespondent to best key
      */
-    public TemplateNode lookup(String actualKey, Matcher context) { // TODO optimize
-        TemplateKey matcherKey = null;
-        TemplateNode templateNode = simpleNodes.get(actualKey);
+    public TemplateNode lookup(String key, Matcher context) {
+        TemplateNode templateNode = simpleNodes.get(key);
         if (templateNode != null) {
             return templateNode;
         }
         for (TemplateNode node : matchedNodes.values()) {
             if (node.getKey().getType() == TemplateKeyType.MATCHER) {
-                if (((MatcherTemplateKey) node.getKey()).match(actualKey, context)) {
+                if (((MatcherTemplateKey) node.getKey()).match(key, context)) {
                     return node;
                 }
             }
@@ -100,6 +98,7 @@ public class ObjectNode extends LinkedHashMap<String, TemplateNode> implements S
         LinkedHashMap<String, Object> map = new LinkedHashMap<>(size());
         for (TemplateNode child : values()) {
             if (child.getKey() != null && child.getKey().getType() == TemplateKeyType.SIMPLE && child.isDataNode())
+                //noinspection unchecked
                 map.put(child.getKey().getValue(), ((DataNode<Object>) child).toData());
         }
         return map;

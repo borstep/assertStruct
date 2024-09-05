@@ -19,7 +19,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-import static org.assertstruct.utils.ResourceUtils.codeLocator;
+import static org.assertstruct.utils.ResourceUtils.*;
 
 /**
  * Class provide comfortable way to work with text data from classpath or strings.
@@ -33,15 +33,15 @@ public class Res {
     static final String SIBLING_PREFIX = "$$/";
     static final String METHOD_PREFIX = "$/$";
     static final String CLASS_PREFIX = "$/";
+    final AssertStructService env;
     @Getter
-    URL resource;
+    final URL resource;
     @Getter
-    ResourceLocation location;
-    String content;
-    AssertStructService env;
-
+    final ResourceLocation location;
     @Getter(lazy = true)
     final ResourceLocation sourceLocation = calcSourceLocation();
+
+    String content;
 
     /**
      * Create resource by autodetect type of resource
@@ -76,6 +76,7 @@ public class Res {
         return of(content, codeLocator(), AssertStruct.getDefault());
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public static Res res(@NonNull String res, StackTraceElement traceElement, AssertStructService env) {
         boolean isFileResource = false;
         if (!res.isEmpty()) {
@@ -132,7 +133,7 @@ public class Res {
                 ResourceLocation.fromStackTrace(traceElement), env);
     }
 
-    Res(URL resource, ResourceLocation location, AssertStructService env) {
+    Res(URL resource, @NonNull ResourceLocation location, AssertStructService env) {
         this.resource = resource;
         this.location = location;
         this.env = env;
@@ -198,7 +199,6 @@ public class Res {
         if (content == null) {
             try (BufferedReader inp = new BufferedReader(new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8))) {
                 content = inp.lines().collect(Collectors.joining("\n"));
-                ;
             } catch (IOException e) {
                 throw new TemplateParseException(e);
             }

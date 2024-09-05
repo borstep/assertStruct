@@ -1,13 +1,13 @@
 package org.assertstruct.template.date;
 
-import org.junit.jupiter.api.Test;
 import org.assertstruct.Res;
 import org.assertstruct.impl.factories.date.AnyDateNode;
 import org.assertstruct.template.Template;
 import org.assertstruct.template.TemplateParseException;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertstruct.TestUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DateNodeTest {
     @Test
@@ -20,7 +20,7 @@ public class DateNodeTest {
     @Test
     void parse_Fail() {
         TemplateParseException templateParseException = assertThrows(TemplateParseException.class, () -> {
-            Template template = Res.res("'$DATE(ttttt)'").asTemplate();
+            Res.res("'$DATE(ttttt)'").asTemplate();
         });
 
         assertEquals("Unrecognized date format: ttttt", templateParseException.getMessage());

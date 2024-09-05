@@ -22,7 +22,7 @@ public class DateFactory implements ParserFactory {
                 new AnyDateParser(buildFormatters(env.getConfig().getDateFormats()), "$ANY_DATE"),
                 new AnyDateParser(dateTimeFormatters, "$ANY_DATETIME"),
                 new AnyDateParser(buildFormatters(env.getConfig().getTimeFormats()), "$ANY_TIME"),
-                new NowParser(env.getConfig().getNowPrecision()*1000, dateTimeFormatters, env.getConfig().isNowStrictCheck()),
+                new NowParser(env.getConfig().getNowPrecision()*1000L, dateTimeFormatters, env.getConfig().isNowStrictCheck()),
                 new DateParser()
         ));
     }

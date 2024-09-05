@@ -3,8 +3,8 @@ package org.assertstruct.impl.validator;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
-import org.assertstruct.service.SharedValidator;
 import org.assertstruct.matcher.Matcher;
+import org.assertstruct.service.SharedValidator;
 
 import java.util.regex.Pattern;
 

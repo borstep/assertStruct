@@ -1,11 +1,11 @@
 package org.assertstruct;
 
+import org.assertstruct.service.AssertStructService;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
-import org.assertstruct.service.AssertStructService;
 
+import static org.assertstruct.utils.MapUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertstruct.utils.MapUtils.mapOf;
 
 class AssertStructServiceTest {
     AssertStructService assertStructService = AssertStruct.getDefault();

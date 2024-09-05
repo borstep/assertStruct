@@ -4,17 +4,15 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.assertstruct.converter.ListWrapper;
+import org.assertstruct.converter.MapWrapper;
+import org.assertstruct.converter.Wrapper;
+import org.assertstruct.impl.factories.array.RepeaterTemplateNode;
+import org.assertstruct.impl.opt.OptionsKey;
 import org.assertstruct.result.*;
 import org.assertstruct.service.AssertStructService;
 import org.assertstruct.service.Config;
 import org.assertstruct.service.SharedValidator;
-import org.assertstruct.converter.ListWrapper;
-import org.assertstruct.converter.MapWrapper;
-import org.assertstruct.converter.Wrapper;
-import org.assertstruct.impl.opt.OptionsKey;
-import org.assertstruct.impl.factories.array.RepeaterTemplateNode;
-import org.assertstruct.template.*;
-import org.assertstruct.result.*;
 import org.assertstruct.template.*;
 import org.assertstruct.template.node.ArrayNode;
 import org.assertstruct.template.node.ObjectNode;
@@ -38,15 +36,14 @@ public class Matcher {
 
     private Object rootValue;
     private Object currentValue;
-    private ArrayDeque<Object> parents = new ArrayDeque<>();
-    private ArrayDeque<Object> keys = new ArrayDeque<>();
+    private final ArrayDeque<Object> parents = new ArrayDeque<>();
+    private final ArrayDeque<Object> keys = new ArrayDeque<>();
 
     public Matcher(AssertStructService env, Template template) {
         this.env = env;
         this.template = template;
         this.config = env.getConfig();
     }
-
 
     public RootResult match(Object value) {
         rootValue = currentValue = convert(value);
@@ -68,16 +65,16 @@ public class Matcher {
         } else if (value instanceof Wrapper) {
             return value;
         } else if (value instanceof Map) {
-            return new MapWrapper((Map) value);
+            return new MapWrapper((Map<String,?>) value);
         } else if (value instanceof Collection) {
-            return new ListWrapper((Collection) value);
+            return new ListWrapper((Collection<?>) value);
         } else {
             return env.getJsonConverter().pojo2json(value);
         }
     }
 
     private MatchResult matchNext(Object key, TemplateNode node) {
-        Wrapper currentWrapper = (Wrapper) currentValue;
+        Wrapper<?,?> currentWrapper = (Wrapper<?,?>) currentValue;
         Object child;
         if (key instanceof EvaluatorTemplateKey) {
             child = convert(((EvaluatorTemplateKey) key).evaluate(currentWrapper.getSource(), this));
@@ -118,12 +115,14 @@ public class Matcher {
             }
         } else if (node instanceof ObjectNode) {
             if (value instanceof Map) {
-                return matchDict((Map) value, (ObjectNode) node);
+                //noinspection unchecked
+                return matchDict((Map<Object, Object>) value, (ObjectNode) node);
             } else {
                 return new ErrorValue(value, node);
             }
         } else if (node instanceof ArrayNode) {
             if (value instanceof List) {
+                //noinspection rawtypes
                 return matchList((List) value, (ArrayNode) node);
             } else {
                 return new ErrorValue(value, node);
@@ -145,7 +144,7 @@ public class Matcher {
         for (int j = actualFrom; j < actual.size(); j++) {
             Object actualValue = actual.get(j);
             TemplateNode expectedNode = i < template.size() ? template.get(i) : null;
-            MatchResult<TemplateNode> match;
+            MatchResult match;
             if (expectedNode == null) { // template is shorter than actual list
                 match = new ErrorValue(actualValue);
             } else if (expectedNode.isConfig() || expectedNode.getKey() instanceof OptionsKey) { // Configuration

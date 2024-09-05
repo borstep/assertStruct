@@ -1,13 +1,12 @@
 package example.model;
 
 import lombok.*;
-import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 @Data
 @Builder
-//@Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
 public class Person {

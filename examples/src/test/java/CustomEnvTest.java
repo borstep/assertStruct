@@ -1,5 +1,5 @@
-import org.junit.jupiter.api.Test;
 import org.assertstruct.AssertStruct;
+import org.junit.jupiter.api.Test;
 
 public class CustomEnvTest {
     @Test
@@ -12,7 +12,4 @@ public class CustomEnvTest {
                 .match("[1,3,2]", new int[]{1, 2, 3});
     }
 
-    @Test
-    public void test() {
-    }
 }

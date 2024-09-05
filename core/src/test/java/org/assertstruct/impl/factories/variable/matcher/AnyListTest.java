@@ -1,16 +1,15 @@
 package org.assertstruct.impl.factories.variable.matcher;
 
-import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 import org.assertstruct.Res;
 import org.assertstruct.impl.factories.variable.ConstantNode;
 import org.assertstruct.template.Template;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.assertstruct.AssertStruct.assertStruct;
+import static org.assertstruct.AssertStruct.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class AnyListTest {

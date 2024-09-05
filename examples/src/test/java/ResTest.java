@@ -1,10 +1,10 @@
-import org.junit.jupiter.api.Test;
 import org.assertstruct.Res;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.assertstruct.AssertStruct.assertStruct;
+import static org.assertstruct.AssertStruct.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ResTest {
     Res POJO = Res.from("example/pojo.json5");

@@ -35,7 +35,7 @@ public class AssertStructConfigLoader {
                 if (setters.containsKey(name)) {
                     setters.get(name).apply(configBuilder, entry.getValue());
                 } else {
-                    log.warn("Unknown config property: " + name);
+                    log.warn("Unknown config property: {}", name);
                 }
             } else if (key.startsWith(EXT_PREFIX)) {
                 String name = key.substring(EXT_PREFIX.length());

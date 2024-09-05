@@ -4,12 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import data.TestPojo;
 import data.ValueObject;
 import org.assertstruct.AssertStruct;
-import org.assertstruct.service.Config;
-import org.junit.jupiter.api.Test;
 import org.assertstruct.converter.MapWrapper;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static data.TestPojo.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class JacksonConverterTest {
     JacksonConverter converter = new JacksonConverter(AssertStruct.getDefault().getConfig());

@@ -1,11 +1,11 @@
 package org.assertstruct.template;
 
+import org.assertstruct.Res;
+import org.assertstruct.impl.opt.NodeOptions;
+import org.assertstruct.impl.parser.JSon5Parser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.assertstruct.impl.opt.NodeOptions;
-import org.assertstruct.impl.parser.JSon5Parser;
-import org.assertstruct.Res;
 
 import java.io.IOException;
 
@@ -86,7 +86,6 @@ class TemplateParserTest {
 
     private static Template parse(Res res) throws IOException {
         TemplateParser parser = new TemplateParser();
-        Template template = parser.parse(new JSon5Parser(res.asChars()));
-        return template;
+        return parser.parse(new JSon5Parser(res.asChars()));
     }
 }

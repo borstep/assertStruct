@@ -26,10 +26,7 @@ public interface Wrapper<S, V> {
 
     default Object getChildSource(Object key) {
         Object child = getChild(key);
-        if (child instanceof Wrapper) {
-            return ((Wrapper) child).getSource();
-        }
-        return child;
+        return Wrapper.source(child);
     }
 
 
@@ -55,14 +52,14 @@ public interface Wrapper<S, V> {
         throw new IllegalArgumentException("Wrapper is not a List");
     }
 
-    public static Object unwrap(Object value) {
+    static Object unwrap(Object value) {
         if (value instanceof Wrapper){
             return ((Wrapper)value).getValue();
         }
         return value;
     }
 
-    public static Object source(Object value) {
+    static Object source(Object value) {
         if (value instanceof Wrapper){
             return ((Wrapper)value).getSource();
         }

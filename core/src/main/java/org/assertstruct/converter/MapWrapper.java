@@ -13,7 +13,7 @@ public class MapWrapper extends LinkedHashMap<String, Object> implements JsonStr
         this.source = source;
     }
 
-    public MapWrapper(Map source) {
+    public MapWrapper(Map<String, ?> source) {
         super(source);
         this.source = source;
     }
@@ -41,7 +41,7 @@ public class MapWrapper extends LinkedHashMap<String, Object> implements JsonStr
         if (!(key instanceof String)) {
             throw new IllegalArgumentException("Map wrapper does not support key '"+key+"' ::"+key.getClass());
         }
-        return get((String) key);
+        return get(key);
     }
 
     @Override

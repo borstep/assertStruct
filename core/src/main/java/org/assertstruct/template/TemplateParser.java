@@ -3,13 +3,13 @@ package org.assertstruct.template;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.assertstruct.AssertStruct;
+import org.assertstruct.impl.parser.ExtToken;
+import org.assertstruct.impl.parser.JSon5Parser;
+import org.assertstruct.impl.validator.TypeCheckValidator;
 import org.assertstruct.service.AssertStructService;
 import org.assertstruct.service.Config;
 import org.assertstruct.service.KeyParser;
 import org.assertstruct.service.NodeParser;
-import org.assertstruct.impl.parser.ExtToken;
-import org.assertstruct.impl.parser.JSon5Parser;
-import org.assertstruct.impl.validator.TypeCheckValidator;
 import org.assertstruct.template.node.ArrayNode;
 import org.assertstruct.template.node.ObjectNode;
 import org.assertstruct.template.node.StringNode;
@@ -34,8 +34,8 @@ public class TemplateParser {
     }
 
     public Template parse(JSon5Parser parser) throws IOException {
-        Deque nodes = new ArrayDeque();
-        TemplateNode node = null;
+        Deque<TemplateNode> nodes = new ArrayDeque<>();
+        TemplateNode node;
         ExtToken token;
         TemplateKey currentKey = null;
         while ((token = parser.next()) != null) {
@@ -75,10 +75,6 @@ public class TemplateParser {
                         }
                 }
                 if (nodes.isEmpty()) {
-                    if (node == null)
-                        throw new TemplateParseException("Can't parse template: empty template", parser.currentLocation());
-//                    if (!(node instanceof StructTemplateNode))
-//                        throw new TemplateParseException("Root node in template must be array or object");
                     return new Template(node, env);
                 } else if (nodes.peek() instanceof ObjectNode) { // object
                     ((ObjectNode) nodes.peek()).put(node.getKey().getValue(), node); //TODO
@@ -96,12 +92,11 @@ public class TemplateParser {
         throw new TemplateParseException("Can't parse template: unexpected end of stream");
     }
 
-
     private TemplateNode buildStringNode(TemplateKey templateKey, ExtToken token) {
         String value = (String) token.getValue();
         TemplateNode result = null;
         TypeCheckValidator typeValidator = null;
-        if (token != null && !token.isDoubleQuoted()) {
+        if (!token.isDoubleQuoted()) {
             int typedIdx = value.indexOf(TypeCheckValidator.DELIMITER);
             if (typedIdx >= 0) {
                 String className = value.substring(typedIdx + TypeCheckValidator.DELIMITER.length());

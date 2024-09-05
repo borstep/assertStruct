@@ -3,10 +3,7 @@ package org.assertstruct.service.exceptions;
 /**
  * Exception thrown when something unexpected happened during matching
  */
-public class MatchingFailure extends RuntimeException{
-    public MatchingFailure() {
-    }
-
+public class MatchingFailure extends RuntimeException {
     public MatchingFailure(String message) {
         super(message);
     }

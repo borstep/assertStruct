@@ -12,12 +12,10 @@ import java.io.Closeable;
 import java.io.IOException;
 
 public class JSon5Parser implements Closeable {
-    private AssertStructService env;
-    Config config;
+    private final AssertStructService env;
+    private final Config config;
+    private final char[] source;
 
-    private char[] source;
-    //    private Stack<TemplateToken> stack = new Stack<>();
-//    private int lastInlineCommentStart = -1;
     private ExtToken lastToken = null;
     private boolean requireInit = true;
     JsonParser parser = null;
@@ -59,7 +57,7 @@ public class JSon5Parser implements Closeable {
 
         int startPosition = (int) parser.currentTokenLocation().getCharOffset();
         int endPosition = (int) parser.currentLocation().getCharOffset() - 1;
-        Object value = null;
+        Object value;
         switch (jsonToken) {
             case FIELD_NAME:
                 value = parser.currentName();

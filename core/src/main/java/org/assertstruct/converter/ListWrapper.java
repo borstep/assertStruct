@@ -2,10 +2,13 @@ package org.assertstruct.converter;
 
 import org.assertstruct.template.TemplateKey;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class ListWrapper extends ArrayList<Object> implements JsonStruct, Wrapper<Object, List<Object>> {
-    private Object source;
+    private final Object source;
 
     public ListWrapper(Object source) {
         this.source = source;

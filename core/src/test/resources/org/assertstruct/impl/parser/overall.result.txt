@@ -5,8 +5,8 @@
   comment suffix */
 ><  <mlcWithSlcWithComa: >><<"value3"> /* field 3 suffix all the way to end of
   line after comma ignoring multiline comments */ , // field 2 suffix
-><  <comentInField /* comment in field */: >><<"value">,
-><  <comentInFieldWithEOL /* comment in field */:
+><  <commentInField /* comment in field */: >><<"value">,
+><  <commentInFieldWithEOL /* comment in field */:
   >><<"value">,
 ><  <simple: >><<"value">,
 ><  // SLC 1

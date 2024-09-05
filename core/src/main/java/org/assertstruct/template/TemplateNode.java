@@ -1,16 +1,16 @@
 package org.assertstruct.template;
 
-import org.assertstruct.service.SharedValidator;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.impl.validator.TypeCheckValidator;
 import org.assertstruct.result.MatchResult;
+import org.assertstruct.service.SharedValidator;
 import org.assertstruct.template.node.ArrayNode;
 import org.assertstruct.template.node.ObjectNode;
 
 import java.io.IOException;
 import java.util.Set;
 
-public interface TemplateNode extends MatchResult<TemplateNode> {
+public interface TemplateNode extends MatchResult {
 
 
 //    void setToken(ExtToken token);

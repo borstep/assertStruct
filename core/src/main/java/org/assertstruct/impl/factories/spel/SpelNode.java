@@ -3,12 +3,12 @@ package org.assertstruct.impl.factories.spel;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.matcher.Matcher;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.node.ScalarNode;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.util.Objects;
 

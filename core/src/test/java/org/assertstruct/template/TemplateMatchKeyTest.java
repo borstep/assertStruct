@@ -1,16 +1,14 @@
 package org.assertstruct.template;
 
-import org.junit.jupiter.api.Test;
 import org.assertstruct.utils.MapUtils;
-
-import java.io.IOException;
+import org.junit.jupiter.api.Test;
 
 import static org.assertstruct.TestUtils.*;
 
 class TemplateMatchKeyTest {
 
     @Test
-    void matchSingleKeyOK() throws IOException {
+    void matchSingleKeyOK() {
         checkOK("template/simple/dict/match.json5", MapUtils.mapOf(
                 "key", "value"
                 , "keyMatch", "value2"
@@ -19,7 +17,7 @@ class TemplateMatchKeyTest {
     }
 
     @Test
-    void matchMultiKeyOK() throws IOException {
+    void matchMultiKeyOK() {
         checkOK("template/simple/dict/match.json5", MapUtils.mapOf(
                 "key", "value"
                 , "keyMatch", "value2"
@@ -29,7 +27,7 @@ class TemplateMatchKeyTest {
     }
 
     @Test
-    void matchWrongOrderOK() throws IOException {
+    void matchWrongOrderOK() {
         checkOK("template/simple/dict/match.json5", MapUtils.mapOf(
                 "keyMatch", "value2"
                 , "key2Match", "value2"
@@ -39,7 +37,7 @@ class TemplateMatchKeyTest {
     }
 
     @Test
-    void matchOrderedOK() throws IOException {
+    void matchOrderedOK() {
         checkOK("template/simple/dict/matchOrdered.json5", MapUtils.mapOf(
                 "key", "value"
                 , "keyMatch", "value2"
@@ -49,7 +47,7 @@ class TemplateMatchKeyTest {
     }
 
     @Test
-    void matchOrderedFail() throws IOException {
+    void matchOrderedFail() {
         checkFail("template/simple/dict/matchOrdered.json5",
                 "template/simple/dict/matchOrdered.wrongOrder.json5", MapUtils.mapOf(
                         "key", "value"
@@ -60,7 +58,7 @@ class TemplateMatchKeyTest {
     }
 
     @Test
-    void matchEmptyFail() throws IOException {
+    void matchEmptyFail() {
         checkFail("{ key: 'value' }",
                 "{ }",
                 MapUtils.mapOf());

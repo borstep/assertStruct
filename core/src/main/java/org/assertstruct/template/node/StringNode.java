@@ -6,11 +6,10 @@ import lombok.experimental.FieldDefaults;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.template.TemplateKey;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StringNode extends ValueNode {
-    @Getter
-    char quoteChar = '\"';
-    @Getter
+    char quoteChar;
     boolean multiline = false; // TODO
 
     public StringNode(TemplateKey key, String value, ExtToken token) {

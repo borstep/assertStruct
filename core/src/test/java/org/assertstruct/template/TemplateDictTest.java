@@ -1,10 +1,8 @@
 package org.assertstruct.template;
 
-import org.junit.jupiter.api.Test;
 import org.assertstruct.Res;
 import org.assertstruct.utils.MapUtils;
-
-import java.io.IOException;
+import org.junit.jupiter.api.Test;
 
 import static org.assertstruct.TestUtils.*;
 
@@ -13,37 +11,35 @@ class TemplateDictTest {
             "key", "value",
             "key1", "value1"
             );
-    public static final Object ARRAY = listOf("a", "b", "c");
-
 
     @Test
-    void emptyOK() throws IOException {
+    void emptyOK() {
         checkOK(Res.of("{}"), MapUtils.mapOf());
     }
 
     @Test
-    void singleOK() throws IOException {
+    void singleOK() {
         checkOK(Res.of("{a:1}"), MapUtils.mapOf("a", 1));
     }
 
     @Test
-    void singleFail() throws IOException {
+    void singleFail() {
         checkFail(Res.of("{a:1}"), Res.of("{a:2}"), MapUtils.mapOf("a", 2));
     }
 
     @Test
-    void doubleFail() throws IOException {
+    void doubleFail() {
         checkFail(Res.of("{a:1, b:2}"),Res.of("{a:2, b:3}"), MapUtils.mapOf("a", 2, "b", 3));
     }
 
     @Test
-    void simpleOK() throws IOException {
+    void simpleOK() {
         checkOK("template/simple/dict/simple.json5", DICT);
     }
 
 
     @Test
-    void simpleFailWrongValue() throws IOException {
+    void simpleFailWrongValue() {
         checkFail(
                 "template/simple/dict/simple.json5",
                 "template/simple/dict/simple.wrongValue.json5",
@@ -52,7 +48,7 @@ class TemplateDictTest {
     }
 
     @Test
-    void simpleFailWrongKey() throws IOException {
+    void simpleFailWrongKey() {
         checkFail(
                 "template/simple/dict/simple.json5",
                 "template/simple/dict/simple.wrongKey.json5",
@@ -61,7 +57,7 @@ class TemplateDictTest {
     }
 
     @Test
-    void simpleFailAddKey() throws IOException {
+    void simpleFailAddKey() {
         checkFail(
                 "template/simple/dict/simple.json5",
                 "template/simple/dict/simple.missedKey.json5",
@@ -75,11 +71,11 @@ class TemplateDictTest {
     }
 
     @Test
-    void orderedOK() throws IOException {
+    void orderedOK() {
         checkOK("template/simple/dict/ordered.json5", DICT);
     }
     @Test
-    void orderedFailWrongOrder() throws IOException {
+    void orderedFailWrongOrder() {
         checkFail("template/simple/dict/ordered.json5",
                 "template/simple/dict/ordered.wrongOrder.json5", MapUtils.mapOf(
                         "key1", "value1",
@@ -88,7 +84,7 @@ class TemplateDictTest {
     }
 
     @Test
-    void simpleIgnoreUnknownOK() throws IOException {
+    void simpleIgnoreUnknownOK() {
         checkOK("template/simple/dict/simpleIgnoreUnknown.json5", MapUtils.mapOf(
                 "unknownKey", "value",
                 "key", "value",

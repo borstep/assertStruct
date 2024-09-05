@@ -46,7 +46,7 @@ public class NowNode extends ScalarNode {
             try {
                 Instant valueParsed = formatter.parse(value.toString(), Instant::from);
                 return (Math.abs(Instant.now().toEpochMilli() - valueParsed.toEpochMilli()) < precision);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         return false;
@@ -77,7 +77,7 @@ public class NowNode extends ScalarNode {
                     Instant valueParsed = formatter.parse(value.toString(), Instant::from);
                     valueInt = valueParsed.toEpochMilli();
                     break;
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
         } else {

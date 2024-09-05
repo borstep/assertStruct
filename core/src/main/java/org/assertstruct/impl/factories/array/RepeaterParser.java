@@ -1,10 +1,10 @@
 package org.assertstruct.impl.factories.array;
 
+import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.service.AssertStructService;
 import org.assertstruct.service.NodeParser;
 import org.assertstruct.service.Parser;
 import org.assertstruct.service.ParserFactory;
-import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 

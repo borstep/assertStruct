@@ -1,10 +1,9 @@
 package org.assertstruct.service;
 
 import lombok.experimental.UtilityClass;
-import org.assertstruct.AssertStruct;
 import org.apache.commons.beanutils.BeanUtils;
+import org.assertstruct.AssertStruct;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.TreeSet;
 
 @UtilityClass

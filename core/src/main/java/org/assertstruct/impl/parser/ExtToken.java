@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-import java.io.IOException;
-
 @Getter
 @Setter(AccessLevel.PACKAGE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -73,6 +71,7 @@ public class ExtToken {
         return !comaIncluded && type.isScalarValue();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isDoubleQuoted() {
         return quoteChar == '"';
     }
@@ -95,7 +94,7 @@ public class ExtToken {
 
     public String toString() {
         return "TemplateToken([" + this.getPrefix() + ":" + this.getStart() + ":" + this.getEnd()
-                + ":" + this.getSuffix() + "] " + +this.getIndent() + " " + this.getType()
+                + ":" + this.getSuffix() + "] " + this.getIndent() + " " + this.getType()
                 + (type.isStructEnd() || type.isStructStart() ? "" : type == JsonToken.FIELD_NAME ? ": " + this.getValue() : ": '" + this.getValue() + "'")
                 + (isComaIncluded() ? "," : "") + (isEOLIncluded() ? "\\n" : "")
                 + " )";

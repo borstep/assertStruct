@@ -1,11 +1,8 @@
 package org.assertstruct.template.node;
 
-import lombok.AccessLevel;
 import lombok.experimental.Delegate;
-import lombok.experimental.FieldDefaults;
 import org.assertstruct.impl.opt.OptionsNode;
 import org.assertstruct.impl.parser.ExtToken;
-import org.assertstruct.template.*;
 import org.assertstruct.template.*;
 
 import java.io.IOException;
@@ -13,11 +10,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ArrayNode extends LinkedList<TemplateNode> implements StructTemplateNode, DataNode<List<Object>> {
 
     @Delegate
-    StructuredTemplateNodeShared shared;
+    private final StructuredTemplateNodeShared shared;
 
     public ArrayNode(TemplateKey key, ExtToken startToken) {
         super();
@@ -62,7 +58,7 @@ public class ArrayNode extends LinkedList<TemplateNode> implements StructTemplat
         ArrayList<Object> list = new ArrayList<>(size());
         for (TemplateNode child : this) {
             if ((child.getKey() == null || child.getKey().getType() == TemplateKeyType.SIMPLE) && child.isDataNode())
-                list.add(((DataNode) child).toData());
+                list.add(((DataNode<?>) child).toData());
         }
         return list;
     }

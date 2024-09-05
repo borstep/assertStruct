@@ -2,19 +2,19 @@ package org.assertstruct.impl.validator;
 
 import data.TestPojo;
 import data.ValueObject;
-import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 import org.assertstruct.Res;
 import org.assertstruct.service.SharedValidator;
 import org.assertstruct.template.Template;
 import org.assertstruct.template.TemplateNode;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 
 import java.util.ArrayList;
 import java.util.Set;
 
+import static org.assertstruct.AssertStruct.*;
+import static org.assertstruct.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertstruct.AssertStruct.assertStruct;
-import static org.assertstruct.TestUtils.listOf;
 
 class TypeCheckValidatorTest {
 
@@ -25,7 +25,7 @@ class TypeCheckValidatorTest {
         Set<SharedValidator> validators = root.getValidators();
         assertEquals(
                 listOf(new TypeCheckValidator(String.class)),
-                new ArrayList(validators)
+                new ArrayList<>(validators)
         );
     }
 
@@ -36,7 +36,7 @@ class TypeCheckValidatorTest {
         Set<SharedValidator> validators = root.getValidators();
         assertEquals(
                 listOf(new TypeCheckValidator(String.class)),
-                new ArrayList(validators)
+                new ArrayList<>(validators)
         );
     }
 

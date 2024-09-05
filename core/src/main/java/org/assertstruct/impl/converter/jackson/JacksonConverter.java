@@ -39,6 +39,7 @@ public class JacksonConverter implements JsonConverter {
             String modules = config.getExt().get(PROP_MODULES);
             for (String module : modules.split(",")) {
                 try {
+                    //noinspection unchecked
                     baseMapper.registerModule(((Class<? extends Module>) Class.forName(module)).newInstance());
                 } catch (ClassNotFoundException e) {
                     log.warn("Jackson module {} not found", module);

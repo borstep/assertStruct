@@ -1,10 +1,10 @@
 package org.assertstruct.impl.factories.variable;
 
 import lombok.Value;
-import org.assertstruct.service.ConstantService;
 import org.assertstruct.impl.factories.variable.matcher.AnyList;
 import org.assertstruct.impl.factories.variable.matcher.AnyObject;
 import org.assertstruct.matcher.ValueMatcher;
+import org.assertstruct.service.ConstantService;
 
 import java.util.Collections;
 import java.util.HashMap;

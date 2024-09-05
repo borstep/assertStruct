@@ -1,9 +1,8 @@
 package org.assertstruct.impl.factories.regexp;
 
 
-import org.assertstruct.service.*;
-import org.assertstruct.service.*;
 import org.assertstruct.impl.parser.ExtToken;
+import org.assertstruct.service.*;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 

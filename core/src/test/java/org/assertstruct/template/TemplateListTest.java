@@ -1,7 +1,7 @@
 package org.assertstruct.template;
 
-import org.junit.jupiter.api.Test;
 import org.assertstruct.Res;
+import org.junit.jupiter.api.Test;
 
 import static org.assertstruct.TestUtils.*;
 

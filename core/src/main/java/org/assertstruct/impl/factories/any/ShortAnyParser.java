@@ -1,8 +1,7 @@
 package org.assertstruct.impl.factories.any;
 
-import org.assertstruct.service.*;
-import org.assertstruct.service.*;
 import org.assertstruct.impl.parser.ExtToken;
+import org.assertstruct.service.*;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 

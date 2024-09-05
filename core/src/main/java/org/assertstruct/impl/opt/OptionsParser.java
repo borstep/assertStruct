@@ -1,8 +1,7 @@
 package org.assertstruct.impl.opt;
 
-import org.assertstruct.service.*;
-import org.assertstruct.service.*;
 import org.assertstruct.impl.parser.ExtToken;
+import org.assertstruct.service.*;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateKeyType;
 import org.assertstruct.template.TemplateNode;
@@ -38,7 +37,7 @@ public class OptionsParser implements KeyParser, NodeParser, ParserFactory {
             if (separatorIdx > 0) {
                 String namePart = value.substring(0, separatorIdx).trim();
                 String valueStr = value.substring(separatorIdx + 1).trim();
-                String name = "";
+                String name;
                 boolean isSubTree = false;
                 if (namePart.startsWith(OptionsParser.PREFIX_FIELD)) {
                     name = namePart.substring(OptionsParser.PREFIX_FIELD.length());

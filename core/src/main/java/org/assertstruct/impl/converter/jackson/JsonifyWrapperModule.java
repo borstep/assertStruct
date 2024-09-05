@@ -29,46 +29,35 @@ class JsonifyWrapperModule extends Module {
     @Override
     public void setupModule(SetupContext context) {
         context.addBeanSerializerModifier(new BeanSerializerModifier() {
-/*
-            @Override
-            public JsonSerializer<?> modifyKeySerializer(SerializationConfig config, JavaType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return super.modifyKeySerializer(config, valueType, beanDesc, serializer);
-            }
-
-            @Override
-            public JsonSerializer<?> modifyEnumSerializer(SerializationConfig config, JavaType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return super.modifyEnumSerializer(config, valueType, beanDesc, serializer);
-            }
-*/
 
             @Override
             public JsonSerializer<?> modifyMapLikeSerializer(SerializationConfig config, MapLikeType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return new WrapperSerializer(serializer);
+                return new WrapperSerializer<>(serializer);
             }
 
             @Override
             public JsonSerializer<?> modifyMapSerializer(SerializationConfig config, MapType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return new WrapperSerializer(serializer);
+                return new WrapperSerializer<>(serializer);
             }
 
             @Override
             public JsonSerializer<?> modifyCollectionLikeSerializer(SerializationConfig config, CollectionLikeType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return new WrapperSerializer(serializer);
+                return new WrapperSerializer<>(serializer);
             }
 
             @Override
             public JsonSerializer<?> modifyCollectionSerializer(SerializationConfig config, CollectionType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return new WrapperSerializer(serializer);
+                return new WrapperSerializer<>(serializer);
             }
 
             @Override
             public JsonSerializer<?> modifyArraySerializer(SerializationConfig config, ArrayType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return new WrapperSerializer(serializer);
+                return new WrapperSerializer<>(serializer);
             }
 
             @Override
             public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                return new WrapperSerializer(serializer);
+                return new WrapperSerializer<>(serializer);
             }
 
         });

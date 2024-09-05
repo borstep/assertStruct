@@ -1,5 +1,5 @@
 # Supported configuration properties
-In `assert-struct.properties` file all this properties must by prefixed with `conf.`
+In `assert-struct.properties` file all this properties must be prefixed with `conf.`
 
 | Property                    | Description                                                                                        | Default value                                                                                               |
 |-----------------------------|----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|

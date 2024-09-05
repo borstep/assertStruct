@@ -4,9 +4,8 @@ import example.model.Person;
 import org.junit.jupiter.api.Test;
 
 import static example.model.ContactType.*;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.assertstruct.AssertStruct.assertStruct;
+import static org.assertstruct.AssertStruct.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class PojoTest {

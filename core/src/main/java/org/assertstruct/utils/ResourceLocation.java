@@ -18,7 +18,6 @@ public class ResourceLocation {
     String fileName;
     String methodName;
     URL url;
-    //    File file;
     int lineNumber;
 
     public static ResourceLocation fromStackTrace(StackTraceElement el) {
@@ -31,12 +30,6 @@ public class ResourceLocation {
         try {
             URL url = ResourceLocation.class.getClassLoader().loadClass(el.getClassName()).getResource(el.getFileName().replace(".java", ".class"));
             builder.url(url);
-/*            if (url != null) {
-                try {
-                    builder.file(new File(url.toURI()));
-                } catch (URISyntaxException e) { // ignore if URL can't be converted into file
-                }
-            }*/
         } catch (ClassNotFoundException e) { // must never happen
             throw new RuntimeException(e);
         }

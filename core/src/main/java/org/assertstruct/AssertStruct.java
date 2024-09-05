@@ -5,7 +5,7 @@ import org.assertstruct.service.AssertStructConfigLoader;
 import org.assertstruct.service.AssertStructService;
 import org.assertstruct.service.Config;
 
-import static org.assertstruct.utils.ResourceUtils.codeLocator;
+import static org.assertstruct.utils.ResourceUtils.*;
 
 @UtilityClass
 public class AssertStruct {

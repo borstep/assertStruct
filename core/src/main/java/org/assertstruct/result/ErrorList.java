@@ -5,9 +5,9 @@ import org.assertstruct.template.node.ArrayNode;
 
 import java.util.ArrayList;
 
-public class ErrorList extends ArrayList<MatchResult> implements ErrorResult<ArrayNode> {
-    @Getter
-    private ArrayNode matchedTo;
+@Getter
+public class ErrorList extends ArrayList<MatchResult> implements ErrorResult {
+    private final ArrayNode matchedTo;
 
     public ErrorList(ArrayNode matchedTo) {
         this.matchedTo = matchedTo;

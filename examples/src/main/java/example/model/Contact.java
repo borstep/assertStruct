@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.jackson.Jacksonized;
 
+@SuppressWarnings("unused")
 @Data
 @Builder
-//@Jacksonized
 @NoArgsConstructor
 @AllArgsConstructor
 public class Contact {

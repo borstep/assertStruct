@@ -1,15 +1,25 @@
 import org.assertstruct.AssertStruct;
+import org.assertstruct.AssertionStructFailedError;
 import org.junit.jupiter.api.Test;
+
+import static org.assertstruct.utils.MapUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomEnvTest {
     @Test
     public void assertCustom() {
-        // TODO create example of define custom environment configuration
+        // Default behavior
+        assertThrows(AssertionStructFailedError.class, () ->
+                AssertStruct
+                        .assertStruct("{a: 1, b: 2}", mapOf("a", 1, "b", 2, "c", 3))
+        );
+
+        // Custom env
         AssertStruct
                 .with()
-                .defaultOrderedLists(false)
+                .defaultIgnoreUnknown(true)
                 .build()
-                .match("[1,3,2]", new int[]{1, 2, 3});
+                .match("{a: 1, b: 2}", mapOf("a", 1, "b", 2, "c", 3));
     }
 
 }

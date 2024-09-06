@@ -133,11 +133,25 @@ public class Matcher {
     }
 
     private MatchResult matchList(List actual, ArrayNode template) {
-        return matchList(actual, 0, template, 0, false);
+        return template.isOrdered() ?
+                matchListOrdered(actual, 0, template, 0, false)
+                : matchListUnordered(actual, 0, template, 0, false);
+    }
+    private MatchResult matchListUnordered(List actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
+        throw new UnsupportedOperationException("Unordered lists are not supported yet");
+//        ErrorList results = new ErrorList(template);
+//        results.addAll(template);
+//        LinkedList<TemplateNode> expectedNodes = new LinkedList<>(template);
+//        BitSet actualFound = new BitSet(actual.size());
+//        boolean hasError = false;
+//        Iterator<MatchResult> it = expectedNodes.iterator();
+//        while ()
+//        for(int i = 0; i < template.size(); i++) {
+//
+//        }
     }
 
-    private MatchResult matchList(List actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
-        boolean ordered = template.isOrdered(); //TODO Implement unordered
+    private MatchResult matchListOrdered(List actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
         int i = templateFrom;
         ErrorList results = new ErrorList(template);
         boolean hasError = false;
@@ -187,7 +201,7 @@ public class Matcher {
     }
 
     private boolean lookAheadFail(List actual, int actualFrom, ArrayNode template, int templateFrom) {
-        return matchList(actual, actualFrom, template, templateFrom, true).hasDifference();
+        return matchListOrdered(actual, actualFrom, template, templateFrom, true).hasDifference();
     }
 /*
     Iterator<Object> actualValues = actual.iterator();

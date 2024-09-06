@@ -154,9 +154,9 @@ If shared, default configuration does not work for you, it is possible to create
 public void assertCustom() {
     AssertStruct
             .with()
-            .defaultOrderedLists(false)
+            .defaultIgnoreUnknown(true)
             .build()
-            .match("[1,3,2]", new int[]{1, 2, 3});
+            .match("{a: 1, b: 2}", mapOf("a", 1, "b", 2, "c", 3));
 }
 ```
 
@@ -229,6 +229,8 @@ There 2 pattern types in keys are supported:
 * Evaluator - will calculate a new value and then will try to match this value to corespondent value in template. For example size, or length methods.
 
 #### Arrays | Lists | Collections 
+> **!! In current version only ordered arrays are supported. Support will be added ASAP, for now I'm looking how to balance flexability and performance**
+
 By default, array elements are ordered, and each array element must be matched to a corresponding template element.
 This can be changed by inline configuration. Because keys are not allowed in arrays, each configuration must be presented as a special string element of the array.
 ```json5
@@ -236,6 +238,8 @@ This can be changed by inline configuration. Because keys are not allowed in arr
   '$opt.ordered: true',
 ]
 ```
+> Unordered arrays matching is quite slow operation and in combination with unstrict matchers like '$*' can cause unexpected results, so use with care.
+
 To support arrays of unknown size it is possible to add special values matcher as array element **'$...'** 
 For example:
 ```json5
@@ -372,6 +376,7 @@ Any feedback is welcome.
 I'm planning to make first release in a few weeks, so if you are considering to use it in production, please go ahead.
 
 # Roadmap
+0. Implement Unordered Lists !!
 1. Add more examples
 2. Implement *Simple evaluator* to not fully depend on SpEL
 3. Add support for <, >, <=, >=, between, etc.

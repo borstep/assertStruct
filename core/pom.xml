@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.assertstruct</groupId>
         <artifactId>assertstruct-root</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
     </parent>
     <artifactId>assertstruct-core</artifactId>
     <name>assertStruct-core</name>

@@ -229,7 +229,7 @@ There 2 pattern types in keys are supported:
 * Evaluator - will calculate a new value and then will try to match this value to corespondent value in template. For example size, or length methods.
 
 #### Arrays | Lists | Collections 
-> **!! In current version only ordered arrays are supported. Support will be added ASAP, for now I'm looking how to balance flexability and performance**
+> **!! In current version only ordered arrays are supported. Support will be added ASAP, for now I'm looking how to balance flexibility and performance**
 
 By default, array elements are ordered, and each array element must be matched to a corresponding template element.
 This can be changed by inline configuration. Because keys are not allowed in arrays, each configuration must be presented as a special string element of the array.
@@ -371,9 +371,9 @@ config.ExampleAssertStructConfigurator
 ```
 
 # Status
-The project is under active development. However, implemented part is already working and I inspire everyone to try it.
-Any feedback is welcome. 
-I'm planning to make first release in a few weeks, so if you are considering to use it in production, please go ahead.
+0.9.0 is the first stable release. It's ready for production, and I'll be happy to help with any issues.
+So, I inspire everyone to try it and give me feedback.
+I'm going to use the 0.9.x versions to gather as much match feedback as possible. Based on this feedback, I'll make the 1.x version, which will be LTS.
 
 # Roadmap
 0. Implement Unordered Lists !!
@@ -395,4 +395,4 @@ Release notes
 -------
 
 ### 0.9.0
-- Initial release
+- Initial stable release

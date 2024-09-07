@@ -3,9 +3,6 @@ package org.assertstruct.template;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.assertstruct.matcher.Matcher;
-import org.assertstruct.result.RootResult;
-import org.assertstruct.service.AssertStructService;
 import org.assertstruct.template.node.ArrayNode;
 import org.assertstruct.template.node.ObjectNode;
 
@@ -16,19 +13,10 @@ import java.util.Map;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class Template {
-    AssertStructService env;
     TemplateNode root;
 
-    public Template(TemplateNode root, AssertStructService env) {
+    public Template(TemplateNode root) {
         this.root = root;
-        this.env = env;
-        if (root instanceof StructTemplateNode) {
-            ((StructTemplateNode) root).sealConfigs(env.getSubtreeOptions());
-        }
-    }
-
-    public RootResult match(Object value) {
-        return new Matcher(env, this).match(value);
     }
 
     public void printDebug(StringBuilder builder) throws IOException {

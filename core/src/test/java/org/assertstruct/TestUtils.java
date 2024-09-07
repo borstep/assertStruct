@@ -1,6 +1,7 @@
 package org.assertstruct;
 
 import lombok.experimental.UtilityClass;
+import org.assertstruct.matcher.Matcher;
 import org.assertstruct.result.MatchResult;
 import org.assertstruct.template.Template;
 
@@ -11,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @UtilityClass
 public class TestUtils {
-    public static List listOf(Object ... values) {
+    @SafeVarargs
+    public static <T> List<T> listOf(T ... values) {
         return Arrays.asList(values);
     }
     public static void checkFail(String template, String expected, Object actualValue) {
@@ -19,7 +21,7 @@ public class TestUtils {
     }
     public static void checkFail(Res resTemplate, Res resExpected, Object actualValue) {
         Template template = parse(resTemplate);
-        MatchResult match = template.match(actualValue);
+        MatchResult match = new Matcher(AssertStruct.getDefault(), template).match(actualValue);
         assertEquals(resExpected.asString(), AssertStruct.jsonify(match));
         assertTrue(match.hasDifference());
     }
@@ -29,7 +31,7 @@ public class TestUtils {
     }
     public static void checkOK(Res res, Object actualValue) {
         Template template = res.asTemplate();
-        MatchResult match = template.match(actualValue);
+        MatchResult match = new Matcher(AssertStruct.getDefault(), template).match(actualValue);
         assertEquals(template.asString(), AssertStruct.jsonify(match));
         assertFalse(match.hasDifference());
     }

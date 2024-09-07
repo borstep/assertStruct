@@ -1,5 +1,6 @@
 package org.assertstruct.result;
 
+import org.assertstruct.AssertStruct;
 import org.assertstruct.Res;
 import org.assertstruct.template.Template;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,8 @@ class Json5PrinterTest {
     void print2LevelsErrorLevel1Result() {
         Json5Printer printer = new Json5Printer();
         Template template = TWO_LEVEL_TEMPLATE.asTemplate();
-        MatchResult match = template.match(mapOf("key", "wrong",
+        MatchResult match = AssertStruct.getDefault().match(template,
+                mapOf("key", "wrong",
                 "arr", listOf(1),
                 "dict", mapOf("key", "value")
         ));

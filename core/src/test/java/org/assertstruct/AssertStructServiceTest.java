@@ -11,9 +11,9 @@ class AssertStructServiceTest {
     AssertStructService assertStructService = AssertStruct.getDefault();
 
     @Test
-    void match() {
+    void assertStruct() {
         AssertionFailedError ex = assertThrows(AssertionFailedError.class, () ->
-                assertStructService.match("{key:1}"
+                assertStructService.assertStruct("{key:1}"
                         , mapOf("key", 2), "Error message")
         );
     }

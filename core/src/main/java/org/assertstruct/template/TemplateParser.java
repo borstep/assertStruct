@@ -75,7 +75,10 @@ public class TemplateParser {
                         }
                 }
                 if (nodes.isEmpty()) {
-                    return new Template(node, env);
+                    if (node instanceof StructTemplateNode) {
+                        ((StructTemplateNode) node).sealConfigs(env.getSubtreeOptions());
+                    }
+                    return new Template(node);
                 } else if (nodes.peek() instanceof ObjectNode) { // object
                     ((ObjectNode) nodes.peek()).put(node.getKey().getValue(), node); //TODO
                 } else if (nodes.peek() instanceof ArrayNode) { // array

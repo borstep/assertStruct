@@ -11,11 +11,15 @@ import org.assertstruct.converter.JsonConverter;
 import org.assertstruct.converter.JsonConverterFactory;
 import org.assertstruct.impl.converter.dummy.DummyConverter;
 import org.assertstruct.impl.opt.SubtreeOptions;
+import org.assertstruct.impl.parser.JSon5Parser;
+import org.assertstruct.matcher.Matcher;
 import org.assertstruct.result.Json5Printer;
 import org.assertstruct.result.MatchResult;
 import org.assertstruct.result.RootResult;
 import org.assertstruct.service.exceptions.MatchingFailure;
 import org.assertstruct.template.Template;
+import org.assertstruct.template.TemplateParseException;
+import org.assertstruct.template.TemplateParser;
 import org.assertstruct.utils.ResourceLocation;
 
 import java.io.File;
@@ -46,18 +50,18 @@ public class AssertStructService implements ResourceSourceLocator {
                 config.isDefaultOrderedLists(),
                 config.isDefaultIgnoreUnknown()
         );
-        if (config.getJsonConverter()!=null) {
-            this.jsonConverter=config.getJsonConverter();
+        if (config.getJsonConverter() != null) {
+            this.jsonConverter = config.getJsonConverter();
         } else {
-            this.jsonConverter=loadJsonConverter(config.getJsonConverterFactories(), config);
-            config=config.toBuilder().jsonConverter(jsonConverter).internalBuildConfig(); // Hack to share potentially expensive converter
+            this.jsonConverter = loadJsonConverter(config.getJsonConverterFactories(), config);
+            config = config.toBuilder().jsonConverter(jsonConverter).internalBuildConfig(); // Hack to share potentially expensive converter
         }
         this.config = config;
         SortedSet<NodeParser> nodeParsers = new TreeSet<>(ParsingFactoryComparator.INSTANCE);
         SortedSet<KeyParser> keyParsers = new TreeSet<>(ParsingFactoryComparator.INSTANCE);
         for (ParserFactory parserFactory : config.getParserFactories()) {
             Parser parsers = parserFactory.buildParser(this);
-            for (Parser parser : (parsers instanceof ParserContainer)? ((ParserContainer) parsers).getParsers() : Collections.singletonList(parsers)) {
+            for (Parser parser : (parsers instanceof ParserContainer) ? ((ParserContainer) parsers).getParsers() : Collections.singletonList(parsers)) {
                 if (parser instanceof NodeParser) {
                     nodeParsers.add((NodeParser) parser);
                 }
@@ -124,26 +128,25 @@ public class AssertStructService implements ResourceSourceLocator {
         return location;
     }
 
-    public void match(@NonNull Res expected, Object actualValue) {
+    public void assertStruct(@NonNull Res expected, Object actualValue) {
         StackTraceElement el = codeLocator();
-        match(expected, actualValue, null, el);
+        assertStruct(expected, actualValue, null, el);
     }
 
-    public void match(@NonNull String expected, Object actualValue) {
-        StackTraceElement el = codeLocator();
-        Res res = Res.res(expected, el, this);
-        match(res, actualValue, null, el);
-    }
-
-    public void match(@NonNull String expected, Object actualValue, String message) {
+    public void assertStruct(@NonNull String expected, Object actualValue) {
         StackTraceElement el = codeLocator();
         Res res = Res.res(expected, el, this);
-        match(res, actualValue, message, el);
+        assertStruct(res, actualValue, null, el);
     }
 
-    public void match(@NonNull Res expected, Object pojoActualValue, String message, StackTraceElement el) {
-        Template template = expected.asTemplate();
-        RootResult match = template.match(pojoActualValue);
+    public void assertStruct(@NonNull String expected, Object actualValue, String message) {
+        StackTraceElement el = codeLocator();
+        Res res = Res.res(expected, el, this);
+        assertStruct(res, actualValue, message, el);
+    }
+
+    public void assertStruct(@NonNull Res expected, Object pojoActualValue, String message, StackTraceElement el) {
+        RootResult match = match(expected, pojoActualValue);
         if (match.hasDifference()) {
             if (el == null) {
                 el = codeLocator();
@@ -189,6 +192,16 @@ public class AssertStructService implements ResourceSourceLocator {
             throw new AssertionStructFailedError(errMessage.toString(), expectedString, actualString, match.getMatchedValue());
         }
     }
+
+    public RootResult match(Res res, Object pojoActualValue) {
+        return match(res.asTemplate(), pojoActualValue);
+    }
+
+    public RootResult match(Template template, Object pojoActualValue) {
+        Matcher matcher = new Matcher(this, template);
+        return matcher.match(pojoActualValue);
+    }
+
     public String jsonify(Object value) {
         Json5Printer printer = new Json5Printer(this);
         printer.print(value);
@@ -206,4 +219,12 @@ public class AssertStructService implements ResourceSourceLocator {
     }
 
 
+    public Template parse(Res res) throws TemplateParseException {
+        try {
+            TemplateParser parser = new TemplateParser(this);
+            return parser.parse(new JSon5Parser(res.asChars(), this));
+        } catch (IOException e) {
+            throw new TemplateParseException(e);
+        }
+    }
 }

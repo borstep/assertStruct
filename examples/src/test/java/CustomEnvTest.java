@@ -19,7 +19,7 @@ public class CustomEnvTest {
                 .with()
                 .defaultIgnoreUnknown(true)
                 .build()
-                .match("{a: 1, b: 2}", mapOf("a", 1, "b", 2, "c", 3));
+                .assertStruct("{a: 1, b: 2}", mapOf("a", 1, "b", 2, "c", 3));
     }
 
 }

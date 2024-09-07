@@ -5,11 +5,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import org.assertstruct.impl.parser.JSon5Parser;
 import org.assertstruct.service.AssertStructService;
 import org.assertstruct.template.Template;
 import org.assertstruct.template.TemplateParseException;
-import org.assertstruct.template.TemplateParser;
 import org.assertstruct.utils.ResourceLocation;
 
 import java.io.BufferedReader;
@@ -173,14 +171,19 @@ public class Res {
      * @return the template
      */
     public Template asTemplate() {
+        return asTemplate(env);
+    }
+
+    /**
+     * Provides the content of the resource as a template.
+     * Template is parsed on the first call and then cached.
+     * @param env the AssertStructService to use for parsing
+     * @return the template
+     */
+    public Template asTemplate(AssertStructService env) {
         checkRead();
         if (_template == null) {
-            try {
-                TemplateParser parser = new TemplateParser(env);
-                _template = parser.parse(new JSon5Parser(asChars()));
-            } catch (IOException e) {
-                throw new TemplateParseException(e);
-            }
+            _template = env.parse(this);
         }
         return _template;
     }

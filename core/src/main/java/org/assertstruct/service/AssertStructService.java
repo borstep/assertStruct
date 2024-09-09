@@ -21,6 +21,7 @@ import org.assertstruct.template.Template;
 import org.assertstruct.template.TemplateParseException;
 import org.assertstruct.template.TemplateParser;
 import org.assertstruct.utils.ResourceLocation;
+import org.opentest4j.AssertionFailedError;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,24 +129,24 @@ public class AssertStructService implements ResourceSourceLocator {
         return location;
     }
 
-    public void assertStruct(@NonNull Res expected, Object actualValue) {
+    public void assertStruct(@NonNull Res expected, Object actualValue) throws AssertionFailedError {
         StackTraceElement el = codeLocator();
         assertStruct(expected, actualValue, null, el);
     }
 
-    public void assertStruct(@NonNull String expected, Object actualValue) {
+    public void assertStruct(@NonNull String expected, Object actualValue) throws AssertionFailedError {
         StackTraceElement el = codeLocator();
         Res res = Res.res(expected, el, this);
         assertStruct(res, actualValue, null, el);
     }
 
-    public void assertStruct(@NonNull String expected, Object actualValue, String message) {
+    public void assertStruct(@NonNull String expected, Object actualValue, String message) throws AssertionFailedError {
         StackTraceElement el = codeLocator();
         Res res = Res.res(expected, el, this);
         assertStruct(res, actualValue, message, el);
     }
 
-    public void assertStruct(@NonNull Res expected, Object pojoActualValue, String message, StackTraceElement el) {
+    public void assertStruct(@NonNull Res expected, Object pojoActualValue, String message, StackTraceElement el) throws AssertionFailedError{
         RootResult match = match(expected, pojoActualValue);
         if (match.hasDifference()) {
             if (el == null) {
@@ -191,7 +192,9 @@ public class AssertStructService implements ResourceSourceLocator {
             String actualString = jsonify(match.getDelegate());
 
             errMessage.append("\nexpected: ").append(expectedString).append(" but was: ").append(actualString);
-            throw new AssertionStructFailedError(errMessage.toString(), expectedString, actualString, match.getMatchedValue());
+//            throw new AssertionStructFailedError(errMessage.toString(), expectedString, actualString, match.getMatchedValue());
+            throw new AssertionFailedError(message, expectedString, actualString,
+                    new AssertionStructFailedError(errMessage.toString(), expectedString, actualString, match.getMatchedValue()));
         }
     }
 

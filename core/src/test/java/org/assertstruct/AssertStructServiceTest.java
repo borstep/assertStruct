@@ -12,7 +12,7 @@ class AssertStructServiceTest {
 
     @Test
     void assertStruct() {
-        AssertionFailedError ex = assertThrows(AssertionFailedError.class, () ->
+        assertThrows(AssertionFailedError.class, () ->
                 assertStructService.assertStruct("{key:1}"
                         , mapOf("key", 2), "Error message")
         );

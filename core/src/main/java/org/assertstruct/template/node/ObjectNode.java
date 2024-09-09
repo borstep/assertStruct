@@ -91,7 +91,7 @@ public class ObjectNode extends LinkedHashMap<String, TemplateNode> implements S
 
     @Override
     public TemplateNode getByKey(Object key) {
-        return simpleNodes.get(key);
+        return key == null || key instanceof String ? get((String) key) : null;
     }
 
     public boolean containsTemplateKey(TemplateKey templateKey) {

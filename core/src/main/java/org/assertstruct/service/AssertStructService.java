@@ -166,7 +166,9 @@ public class AssertStructService implements ResourceSourceLocator {
                         + "_" + testLocation.getMethodName() + "_" + testLocation.getLineNumber() + ".json5");
                 File parentFile = matchFile.getParentFile();
                 if (!parentFile.exists()) {
-                    parentFile.mkdirs();
+                    if (!parentFile.mkdirs()) {
+                        throw new AssertionStructFailedError("Can't generate error data because directory " + parentFile.getAbsolutePath() + " doesn't exist", null, null, null);
+                    }
                 }
                 save(match, matchFile);
                 ResourceLocation matchLocation = ResourceLocation.fromFile(matchFile);

@@ -64,6 +64,7 @@ public class Matcher {
         } else if (value instanceof Wrapper) {
             return value;
         } else if (value instanceof Map) {
+            //noinspection unchecked
             return new MapWrapper((Map<String,?>) value);
         } else if (value instanceof Collection) {
             return new ListWrapper((Collection<?>) value);
@@ -131,12 +132,14 @@ public class Matcher {
         }
     }
 
-    private MatchResult matchList(List actual, ArrayNode template) {
+    private MatchResult matchList(List<?> actual, ArrayNode template) {
         return template.isOrdered() ?
                 matchListOrdered(actual, 0, template, 0, false)
-                : matchListUnordered(actual, 0, template, 0, false);
+                : matchListUnordered(actual, template);
     }
-    private MatchResult matchListUnordered(List actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
+
+    private MatchResult matchListUnordered(List<?> actual, ArrayNode template) {
+        int actualFrom=0;
         int actualTo = actual.size();
         ErrorList results;
         LinkedList<MatchResult> expectedNodes = new LinkedList<>(template);
@@ -237,7 +240,7 @@ public class Matcher {
         }
     }
 
-    private MatchResult matchListOrdered(List actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
+    private MatchResult matchListOrdered(List<?> actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
         int i = templateFrom;
         ErrorList results = new ErrorList(template);
         boolean hasError = false;
@@ -286,7 +289,7 @@ public class Matcher {
         }
     }
 
-    private boolean lookAheadFail(List actual, int actualFrom, ArrayNode template, int templateFrom) {
+    private boolean lookAheadFail(List<?> actual, int actualFrom, ArrayNode template, int templateFrom) {
         return matchListOrdered(actual, actualFrom, template, templateFrom, true).hasDifference();
     }
 

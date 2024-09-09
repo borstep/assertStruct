@@ -57,11 +57,11 @@ public class TemplateParser {
                             currentKey = buildKey(token);
                             continue;
                         case END_ARRAY:
-                            node = (ArrayNode) nodes.pop();
+                            node = nodes.pop();
                             ((ArrayNode) node).setToken(token);
                             break;
                         case END_OBJECT:
-                            node = (ObjectNode) nodes.pop();
+                            node = nodes.pop();
                             ((ObjectNode) node).setToken(token);
                             break;
                         case VALUE_STRING:

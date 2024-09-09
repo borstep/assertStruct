@@ -32,18 +32,18 @@ class TemplateParserTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @CsvSource(value = {
             // Dicts
-            "template/config/orderedDictDefault.json5, false",
+            "template/config/orderedDictDefault.json5, null",
             "template/config/orderedDictTrue.json5, true",
             "template/config/orderedDictTrue.short.json5, true",
             //Arrays
-            "template/config/orderedArrayDefault.json5, true",
+            "template/config/orderedArrayDefault.json5, null",
             "template/config/orderedArrayFalse.json5, false",
-    })
-    void configOrdered(String res, boolean expected) throws IOException {
+    }, nullValues={"null"})
+    void configOrdered(String res, Boolean expected) throws IOException {
         Template template = parse(res);
-        assertEquals(expected, template.asStruct().getConfig().isOrdered());
+        assertEquals(expected, template.asStruct().getConfig().getOrdered());
     }
 
     @Test
@@ -52,17 +52,11 @@ class TemplateParserTest {
 
         assertEquals(new NodeOptions(
                 false,
-                true,
-                true,
                 false), template.asStruct().getConfig(), "Wrong root node");
         assertEquals(new NodeOptions(
                 true,
-                true,
-                true,
                 true), template.asDict().getByKey("child").asDict().getConfig(), "Wrong inherited node");
         assertEquals(new NodeOptions(
-                true,
-                true,
                 true,
                 false), template.asDict().get("childOverride").asDict().getConfig(), "Wrong inherited node with override");
     }

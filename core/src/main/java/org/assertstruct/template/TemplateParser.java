@@ -3,6 +3,7 @@ package org.assertstruct.template;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.assertstruct.AssertStruct;
+import org.assertstruct.impl.opt.SubtreeOptions;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.impl.parser.JSon5Parser;
 import org.assertstruct.impl.validator.TypeCheckValidator;
@@ -78,7 +79,7 @@ public class TemplateParser {
                     }
                     if (nodes.isEmpty()) {
                         if (node instanceof StructTemplateNode) {
-                            ((StructTemplateNode) node).sealConfigs(env.getSubtreeOptions());
+                            ((StructTemplateNode) node).sealConfigs(SubtreeOptions.INITIAL);
                         }
                         return new Template(node);
                     } else if (nodes.peek() instanceof ObjectNode) { // object

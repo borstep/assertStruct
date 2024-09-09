@@ -10,9 +10,10 @@ import org.assertstruct.opt.OptionsBuilder;
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
 public class SubtreeOptions {
-    boolean orderedDicts;
-    boolean orderedLists;
-    boolean ignoreUnknown;
+    public static final SubtreeOptions INITIAL = new SubtreeOptions(null, null, null);
+    Boolean orderedDicts;
+    Boolean orderedLists;
+    Boolean ignoreUnknown;
 
     public static SubtreeOptionsBuilder builder() {
         return new SubtreeOptionsBuilder();

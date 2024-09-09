@@ -133,7 +133,7 @@ public class Matcher {
     }
 
     private MatchResult matchList(List<?> actual, ArrayNode template) {
-        return template.isOrdered() ?
+        return template.isOrdered(env.getSubtreeOptions()) ?
                 matchListOrdered(actual, 0, template, 0, false)
                 : matchListUnordered(actual, template);
     }
@@ -294,8 +294,8 @@ public class Matcher {
     }
 
     private MatchResult matchDict(Map<Object, Object> actual, ObjectNode template) {
-        boolean ordered = template.isOrdered();
-        boolean ignoreUnknown = template.isIgnoreUnknown();
+        boolean ordered = template.isOrdered(env.getSubtreeOptions());
+        boolean ignoreUnknown = template.isIgnoreUnknown(env.getSubtreeOptions());
         HashSet<Object> foundKeys = new HashSet<>();
         ErrorMap results = new ErrorMap(template);
         Iterator<Object> actualKeys = actual.keySet().iterator();

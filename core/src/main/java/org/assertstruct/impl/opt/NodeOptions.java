@@ -11,10 +11,10 @@ import org.assertstruct.opt.OptionsBuilder;
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 public class NodeOptions extends SubtreeOptions {
 
-    boolean ordered;
+    Boolean ordered;
 
-    public NodeOptions(boolean ordered, boolean orderedDicts, boolean orderedLists, boolean ignoreUnknown) {
-        super(orderedDicts, orderedLists, ignoreUnknown);
+    public NodeOptions(Boolean ordered, Boolean ignoreUnknown) {
+        super(null, null, ignoreUnknown);
         this.ordered = ordered;
     }
 
@@ -39,8 +39,6 @@ public class NodeOptions extends SubtreeOptions {
         public NodeOptions build(SubtreeOptions parent, boolean isDict) {
             return new NodeOptions(
                     ordered == null ? (isDict ? parent.orderedDicts : parent.orderedLists) : ordered,
-                    parent.orderedDicts,
-                    parent.orderedLists,
                     ignoreUnknown == null ? parent.ignoreUnknown : ignoreUnknown);
         }
 

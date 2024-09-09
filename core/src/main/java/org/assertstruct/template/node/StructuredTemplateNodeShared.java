@@ -83,7 +83,7 @@ public class StructuredTemplateNodeShared {
         if (subtreeConfigBuilder != null) {
             parentConfig = subtreeConfigBuilder.build(parentConfig);
         }
-        boolean isDict = !(children instanceof ArrayNode);
+        boolean isDict = isDict();
         config = configBuilder == null ?
                 NodeOptions.NodeOptionsBuilder.buildDefault(parentConfig, isDict) :
                 configBuilder.build(parentConfig, isDict);
@@ -94,19 +94,16 @@ public class StructuredTemplateNodeShared {
         }
     }
 
-    public boolean isOrdered() {
-        return this.config.isOrdered();
+    private boolean isDict() {
+        return !(children instanceof ArrayNode);
     }
 
-    public boolean isOrderedDicts() {
-        return this.config.isOrderedDicts();
+    public boolean isOrdered(SubtreeOptions defaults) {
+        Boolean ordered = this.config.getOrdered();
+        return ordered == null ? (isDict() ? defaults.getOrderedDicts() : defaults.getOrderedLists()) : ordered;
     }
 
-    public boolean isOrderedLists() {
-        return this.config.isOrderedLists();
-    }
-
-    public boolean isIgnoreUnknown() {
-        return this.config.isIgnoreUnknown();
+    public boolean isIgnoreUnknown(SubtreeOptions defaults) {
+        return this.config.getIgnoreUnknown()==null ? defaults.getIgnoreUnknown() : this.config.getIgnoreUnknown();
     }
 }

@@ -7,10 +7,6 @@ import org.assertstruct.impl.parser.ExtToken;
 public interface StructTemplateNode extends TemplateNode {
     ExtToken getStartToken();
 
-    @Override
-    default boolean isScalar() {
-        return false;
-    }
 
     NodeOptions getConfig();
 

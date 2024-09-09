@@ -19,10 +19,13 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TemplateParser {
-    AssertStructService env;
-    Config config;
+    final AssertStructService env;
+    final Config config;
+
+    final Deque<TemplateNode> nodes = new ArrayDeque<>();
+    TemplateKey currentKey;
 
     public TemplateParser() {
         this(AssertStruct.getDefault());
@@ -34,65 +37,72 @@ public class TemplateParser {
     }
 
     public Template parse(JSon5Parser parser) throws IOException {
-        Deque<TemplateNode> nodes = new ArrayDeque<>();
-        TemplateNode node;
-        ExtToken token;
-        TemplateKey currentKey = null;
-        while ((token = parser.next()) != null) {
-            try {
-                switch (token.getType()) {
-                    case START_OBJECT:
-                        node = new ObjectNode(currentKey, token);
-                        currentKey = null;
-                        nodes.push(node);
-                        continue;
-                    case START_ARRAY:
-                        node = new ArrayNode(currentKey, token);
-                        currentKey = null;
-                        nodes.push(node);
-                        continue;
-                    case FIELD_NAME:
-                        currentKey = buildKey(token);
-                        continue;
-                    case END_ARRAY:
-                        node = (ArrayNode) nodes.pop();
-                        ((ArrayNode) node).setToken(token);
-                        break;
-                    case END_OBJECT:
-                        node = (ObjectNode) nodes.pop();
-                        ((ObjectNode) node).setToken(token);
-                        break;
-                    case VALUE_STRING:
-                        node = buildStringNode(currentKey, token);
-                        currentKey = null;
-                        break;
-                    default:
-                        if (token.getType().isScalarValue()) {
-                            node = new ValueNode(currentKey, token.getValue(), token);
+        try {
+            TemplateNode node;
+            ExtToken token;
+            while ((token = parser.next()) != null) {
+                try {
+                    switch (token.getType()) {
+                        case START_OBJECT:
+                            node = new ObjectNode(currentKey, token);
                             currentKey = null;
-                        } else {
-                            throw new TemplateParseException("Unexpected token: " + token, token.getLocation());
-                        }
-                }
-                if (nodes.isEmpty()) {
-                    if (node instanceof StructTemplateNode) {
-                        ((StructTemplateNode) node).sealConfigs(env.getSubtreeOptions());
+                            nodes.push(node);
+                            continue;
+                        case START_ARRAY:
+                            node = new ArrayNode(currentKey, token);
+                            currentKey = null;
+                            nodes.push(node);
+                            continue;
+                        case FIELD_NAME:
+                            currentKey = buildKey(token);
+                            continue;
+                        case END_ARRAY:
+                            node = (ArrayNode) nodes.pop();
+                            ((ArrayNode) node).setToken(token);
+                            break;
+                        case END_OBJECT:
+                            node = (ObjectNode) nodes.pop();
+                            ((ObjectNode) node).setToken(token);
+                            break;
+                        case VALUE_STRING:
+                            node = buildStringNode(currentKey, token);
+                            currentKey = null;
+                            break;
+                        default:
+                            if (token.getType().isScalarValue()) {
+                                node = new ValueNode(currentKey, token.getValue(), token);
+                                currentKey = null;
+                            } else {
+                                throw new TemplateParseException("Unexpected token: " + token, token.getLocation());
+                            }
                     }
-                    return new Template(node);
-                } else if (nodes.peek() instanceof ObjectNode) { // object
-                    ((ObjectNode) nodes.peek()).put(node.getKey().getValue(), node); //TODO
-                } else if (nodes.peek() instanceof ArrayNode) { // array
-                    ((ArrayNode) nodes.peek()).add(node);
-                } else {
-                    throw new TemplateParseException("Unexpected token: " + token, token.getLocation());
+                    if (nodes.isEmpty()) {
+                        if (node instanceof StructTemplateNode) {
+                            ((StructTemplateNode) node).sealConfigs(env.getSubtreeOptions());
+                        }
+                        return new Template(node);
+                    } else if (nodes.peek() instanceof ObjectNode) { // object
+                        ((ObjectNode) nodes.peek()).put(node.getKey().getValue(), node); //TODO
+                    } else if (nodes.peek() instanceof ArrayNode) { // array
+                        ((ArrayNode) nodes.peek()).add(node);
+                    } else {
+                        throw new TemplateParseException("Unexpected token: " + token, token.getLocation());
+                    }
+                } catch (TemplateParseException e) {
+                    throw e;
+                } catch (Throwable e) {
+                    throw new TemplateParseException(e, parser.currentLocation());
                 }
-            } catch (TemplateParseException e) {
-                throw e;
-            } catch (Throwable e) {
-                throw new TemplateParseException(e, parser.currentLocation());
             }
+            throw new TemplateParseException("Can't parse template: unexpected end of stream");
+        } finally {
+            nodes.clear();
+            currentKey = null;
         }
-        throw new TemplateParseException("Can't parse template: unexpected end of stream");
+    }
+
+    public StructTemplateNode currentNode() {
+        return nodes.isEmpty() ? null : (StructTemplateNode) nodes.peek();
     }
 
     private TemplateNode buildStringNode(TemplateKey templateKey, ExtToken token) {
@@ -110,7 +120,7 @@ public class TemplateParser {
             }
             for (NodeParser nodeParser : env.getNodeParsers()) {
                 if (value.startsWith(nodeParser.getPrefix())) {
-                    result = nodeParser.parseNode(value, templateKey, token);
+                    result = nodeParser.parseNode(value, templateKey, token, this);
                     if (result != null)
                         break;
                 }

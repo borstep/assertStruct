@@ -1,15 +1,19 @@
 package org.assertstruct.impl.factories.array;
 
+import lombok.Getter;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.matcher.Matcher;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 import org.assertstruct.template.node.ScalarNode;
 
-public class RepeaterTemplateNode extends ScalarNode {
+@Getter
+public class RepeaterNode extends ScalarNode {
+    TemplateNode repeatedNode;
 
-    public RepeaterTemplateNode(TemplateKey key, ExtToken token) {
+    public RepeaterNode(TemplateNode repeatedNode, TemplateKey key, ExtToken token) {
         super(key, token);
+        this.repeatedNode = repeatedNode;
     }
 
     @Override
@@ -17,11 +21,8 @@ public class RepeaterTemplateNode extends ScalarNode {
         return false;
     }
 
-    public static boolean isRepeater(TemplateNode node) {
-        return node instanceof RepeaterTemplateNode;
-    }
-
-    public static boolean isNotRepeater(TemplateNode node) {
-        return !(node instanceof RepeaterTemplateNode);
+    @Override
+    public boolean isRepeaterFor(TemplateNode node) {
+        return repeatedNode == node;
     }
 }

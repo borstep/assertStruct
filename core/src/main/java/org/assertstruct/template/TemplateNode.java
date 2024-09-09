@@ -1,5 +1,6 @@
 package org.assertstruct.template;
 
+import org.assertstruct.impl.factories.array.RepeaterNode;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.impl.validator.TypeCheckValidator;
 import org.assertstruct.result.MatchResult;
@@ -12,19 +13,24 @@ import java.util.Set;
 
 public interface TemplateNode extends MatchResult {
 
-
-//    void setToken(ExtToken token);
-
     ExtToken getToken();
 
     TemplateKey getKey();
 
     default boolean isScalar() {
-        return true;
+        return !isStruct();
     }
 
     default boolean isStruct() {
-        return !isScalar();
+        return isArray() || isObject();
+    }
+
+    default boolean isArray() {
+        return false;
+    }
+
+    default boolean isObject() {
+        return false;
     }
 
     default void printDebug(StringBuilder out) throws IOException {
@@ -88,5 +94,18 @@ public interface TemplateNode extends MatchResult {
     default boolean isDataNode() {
         return false;
     }
+
+    default boolean isRepeater() {
+        return this instanceof RepeaterNode;
+    }
+
+    default boolean isRepeaterFor(TemplateNode node) {
+        return false;
+    }
+
+    default boolean isNotRepeater() {
+        return !isRepeater();
+    }
+
 
 }

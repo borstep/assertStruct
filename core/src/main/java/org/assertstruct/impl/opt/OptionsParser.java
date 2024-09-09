@@ -5,6 +5,7 @@ import org.assertstruct.service.*;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateKeyType;
 import org.assertstruct.template.TemplateNode;
+import org.assertstruct.template.TemplateParser;
 import org.assertstruct.utils.ConversionUtils;
 
 public class OptionsParser implements KeyParser, NodeParser, ParserFactory {
@@ -31,7 +32,7 @@ public class OptionsParser implements KeyParser, NodeParser, ParserFactory {
     }
 
     @Override
-    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
+    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token, TemplateParser templateParser) {
         if (value.startsWith(PREFIX)) {
             int separatorIdx = value.indexOf(CONFIG_VALUE_SEPARATOR);
             if (separatorIdx > 0) {

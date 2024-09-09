@@ -6,6 +6,7 @@ import org.assertstruct.service.NodeParser;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 import org.assertstruct.template.TemplateParseException;
+import org.assertstruct.template.TemplateParser;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,7 +24,7 @@ public class NowParser implements NodeParser {
     boolean strictCheck;
 
     @Override
-    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
+    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token, TemplateParser templateParser) {
         if (value.equals(PREFIX)) {
             return new NowNode( defaultPrecision, strictCheck, formatters, templateKey, token);
         } else if (value.startsWith(PREFIX_LONG)&&value.endsWith(")") ) {

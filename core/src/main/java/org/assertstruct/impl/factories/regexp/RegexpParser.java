@@ -5,6 +5,7 @@ import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.service.*;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
+import org.assertstruct.template.TemplateParser;
 
 import java.util.regex.Pattern;
 
@@ -23,7 +24,7 @@ public class RegexpParser implements KeyParser, NodeParser, ParserFactory {
     }
 
     @Override
-    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
+    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token, TemplateParser templateParser) {
         if (value.startsWith(PREFIX) && value.endsWith("/")) {
             String regexp = value.substring(PREFIX.length(), value.length() - 1);
             return new RegexpNode(Pattern.compile(regexp), templateKey, token);

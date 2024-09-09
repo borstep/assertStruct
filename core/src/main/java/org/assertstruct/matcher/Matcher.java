@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.assertstruct.converter.ListWrapper;
 import org.assertstruct.converter.MapWrapper;
 import org.assertstruct.converter.Wrapper;
-import org.assertstruct.impl.factories.array.RepeaterTemplateNode;
+import org.assertstruct.impl.factories.array.RepeaterNode;
 import org.assertstruct.impl.opt.OptionsKey;
 import org.assertstruct.result.*;
 import org.assertstruct.service.AssertStructService;
@@ -19,7 +19,6 @@ import org.assertstruct.template.node.ObjectNode;
 
 import java.util.*;
 
-import static org.assertstruct.impl.factories.array.RepeaterTemplateNode.*;
 import static org.assertstruct.utils.ConversionUtils.*;
 import static org.assertstruct.utils.Markers.*;
 
@@ -138,17 +137,104 @@ public class Matcher {
                 : matchListUnordered(actual, 0, template, 0, false);
     }
     private MatchResult matchListUnordered(List actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
-        throw new UnsupportedOperationException("Unordered lists are not supported yet");
-//        ErrorList results = new ErrorList(template);
-//        results.addAll(template);
-//        LinkedList<TemplateNode> expectedNodes = new LinkedList<>(template);
-//        BitSet actualFound = new BitSet(actual.size());
-//        boolean hasError = false;
-//        Iterator<MatchResult> it = expectedNodes.iterator();
-//        while ()
-//        for(int i = 0; i < template.size(); i++) {
-//
-//        }
+        int actualTo = actual.size();
+        ErrorList results;
+        LinkedList<MatchResult> expectedNodes = new LinkedList<>(template);
+        ArrayList<RepeaterNode> repeaters = new ArrayList<>();
+        BitSet actualFound = new BitSet(actual.size());
+        HashMap<Integer, MatchResult> foundPositions = new HashMap<>();
+        boolean hasError = false;
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        Iterator<TemplateNode> it = (Iterator<TemplateNode>) (Iterator) expectedNodes.iterator(); // For now, we have only TemplateNodes
+        TemplateNode lastRemoved = null;
+        Integer lastFoundPosition = null;
+        template:
+        while (it.hasNext()) {
+            TemplateNode expectedNode = it.next();
+            if (expectedNode.isConfig()) { // Just add configs straight away
+                continue;
+            }
+            while (actualTo > actualFrom && actualFound.get(actualTo - 1)) { //shrink actual bounds to avoid double checks
+                actualTo--;
+            }
+            if (expectedNode.isRepeater()) { // Let's check repeaters afterward
+                if (expectedNode.isRepeaterFor(lastRemoved)) { // remove repeater if main node was removed
+                    lastRemoved = null;
+                    it.remove();
+                    continue;
+                }
+                if (lastFoundPosition != null && expectedNode.isRepeaterFor((TemplateNode) foundPositions.get(lastFoundPosition))) { //move found position after repeater
+                    foundPositions.put(lastFoundPosition, expectedNode);
+                    lastFoundPosition = null;
+                }
+                repeaters.add((RepeaterNode) expectedNode);
+            } else {
+                lastFoundPosition = null;
+                for (int j = actualFrom; j < actualTo; j++) {
+                    if (actualFound.get(j)) { // already found
+                        if (j == actualFrom) { // to avoid double checks on next loop
+                            actualFrom++;
+                        }
+                    } else {
+                        MatchResult match = matchNext(j, expectedNode);
+                        if (!match.hasDifference()) {
+                            foundPositions.put(j, expectedNode);
+                            lastFoundPosition = j;
+                            actualFound.set(j);
+                            if (j == actualFrom) { // to avoid double checks on next loop
+                                actualFrom++;
+                            }
+                            if (j + 1 == actualTo) { // to avoid double checks on next loop
+                                actualTo--;
+                            }
+                            continue template;
+                        }
+                    }
+                }
+                hasError = true;
+                lastRemoved = expectedNode; // marker to remove repeater if main node was removed
+                it.remove();
+            }
+        }
+        // add not matched nodes to the end, also checking repeaters in process
+        actualValues:
+        for (int j = actualFrom; j < actualTo; j++) {
+            if (!actualFound.get(j)) {
+                for (RepeaterNode repeater : repeaters) {
+                    MatchResult match = matchNext(j, repeater.getRepeatedNode());
+                    if (!match.hasDifference()) {
+                        foundPositions.put(j, repeater);
+                        continue actualValues;
+                    }
+                }
+                hasError = true;
+                ErrorValue errorValue = new ErrorValue(actual.get(j));
+                foundPositions.put(j, errorValue);
+                boolean errorInserted = false;
+                if (j > 0) { // try to insert Error after previous actual element match
+                    ListIterator<MatchResult> lookupIt = expectedNodes.listIterator();
+                    MatchResult prevMatch = foundPositions.get(j - 1);
+                    while (lookupIt.hasNext()) {
+                        if (lookupIt.next() == prevMatch) {
+                            lookupIt.add(errorValue);
+                            errorInserted = true;
+                            break;
+                        }
+                    }
+                }
+                if (!errorInserted) { // if not inserted, add at the end
+                    expectedNodes.add(errorValue);
+                }
+
+            }
+        }
+        if (hasError) {
+            results = new ErrorList(template);
+            results.addAll(expectedNodes);
+            return results;
+        } else {
+            return template;
+        }
     }
 
     private MatchResult matchListOrdered(List actual, int actualFrom, ArrayNode template, int templateFrom, boolean quickFail) {
@@ -166,12 +252,12 @@ public class Matcher {
                 i++;
                 j--; //rerun same actual node
                 continue;
-            } else if (isRepeater(expectedNode)) {
+            } else if (expectedNode.isRepeater()) {
                 if (!results.isEmpty() && results.get(results.size() - 1) != expectedNode)
                     results.add(expectedNode);
-                long remainingTemplateLength = template.stream().skip(i).filter(RepeaterTemplateNode::isNotRepeater).count();
+                long remainingTemplateLength = template.stream().skip(i).filter(TemplateNode::isNotRepeater).count();
                 int remainingActualLength = actual.size() - j;
-                match = matchNext(j, template.get(i - 1));
+                match = matchNext(j, ((RepeaterNode) expectedNode).getRepeatedNode());
                 if (!match.hasDifference()
                         && remainingTemplateLength <= remainingActualLength
                         && lookAheadFail(actual, j, template, i + 1)) {
@@ -190,7 +276,7 @@ public class Matcher {
             }
             results.add(match);
         }
-        if (i < template.size() && !(i + 1 == template.size() && isRepeater(template.get(i)))) { // template is longer than actual list ignoring last repeater
+        if (i < template.size() && !(i + 1 == template.size() && template.get(i).isRepeater())) { // template is longer than actual list ignoring last repeater
             hasError = true;
         }
         if (hasError) {
@@ -203,40 +289,6 @@ public class Matcher {
     private boolean lookAheadFail(List actual, int actualFrom, ArrayNode template, int templateFrom) {
         return matchListOrdered(actual, actualFrom, template, templateFrom, true).hasDifference();
     }
-/*
-    Iterator<Object> actualValues = actual.iterator();
-        Iterator<TemplateNode> expectedNodes = template.iterator();
-        TemplateNode expectedNode = nextExpectedNode(expectedNodes);
-        ErrorList results = new ErrorList(template);
-        boolean hasError = false;
-        while (actualValue != EOS || expectedNode != null) {
-            if (expectedNode != null && (expectedNode.isConfig() || expectedNode.getKey() instanceof ConfigTemplateKey)) { // Configuration
-                results.add(expectedNode); // Just copy config as is
-                expectedNode=nextExpectedNode(expectedNodes);
-                continue;    // TODO implement
-            } else if (actualValue == EOS) { // actual list is shorter then template
-                hasError = true;
-                break;
-            } else if (expectedNode == null) { // actual list is longer -> copy remaining actual values
-                results.add(new ErrorValue(actualValue, expectedNode));
-                actualValue = nextActual(actualValues);
-                hasError = true;
-                continue;
-            } else {
-                MatchResult match = match(actualValue, expectedNode, this);
-                results.add(match);
-                actualValue = nextActual(actualValues);
-                expectedNode = nextExpectedNode(expectedNodes);
-                if (match.hasDifference())
-                    hasError = true;
-                continue;
-            }
-        }
-        if (hasError) {
-            return results;
-        }
-        return template;
-    }*/
 
     private MatchResult matchDict(Map<Object, Object> actual, ObjectNode template) {
         boolean ordered = template.isOrdered();

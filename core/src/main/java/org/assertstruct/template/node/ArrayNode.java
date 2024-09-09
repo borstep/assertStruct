@@ -21,6 +21,11 @@ public class ArrayNode extends LinkedList<TemplateNode> implements StructTemplat
     }
 
     @Override
+    public boolean isArray() {
+        return true;
+    }
+
+    @Override
     public void printDebug(StringBuilder out) throws IOException {
         if (shared.startToken != null)
             shared.startToken.print(out, false, false);

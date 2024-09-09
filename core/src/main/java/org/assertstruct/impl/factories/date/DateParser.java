@@ -7,6 +7,7 @@ import org.assertstruct.service.NodeParser;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 import org.assertstruct.template.TemplateParseException;
+import org.assertstruct.template.TemplateParser;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -18,7 +19,7 @@ public class DateParser implements NodeParser {
     public static final String PREFIX = "$DATE(";
 
     @Override
-    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
+    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token, TemplateParser templateParser) {
         if (value.startsWith(PREFIX) && value.endsWith(")")) {
             String format = value.substring(PREFIX.length(), value.length() - 1).trim();
             try {

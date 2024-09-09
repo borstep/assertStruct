@@ -8,6 +8,7 @@ import org.assertstruct.service.Parser;
 import org.assertstruct.service.ParserFactory;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
+import org.assertstruct.template.TemplateParser;
 
 @Value
 public class ConstantParser implements NodeParser, ParserFactory {
@@ -15,7 +16,7 @@ public class ConstantParser implements NodeParser, ParserFactory {
     public static final String PREFIX = "$";
 
     @Override
-    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
+    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token, TemplateParser templateParser) {
         return new ConstantNode(value.substring(PREFIX.length()), templateKey, token);
     }
 

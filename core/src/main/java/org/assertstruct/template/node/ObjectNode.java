@@ -28,6 +28,11 @@ public class ObjectNode extends LinkedHashMap<String, TemplateNode> implements S
     }
 
     @Override
+    public boolean isObject() {
+        return true;
+    }
+
+    @Override
     public void printDebug(StringBuilder out) throws IOException {
         if (shared.startToken != null)
             shared.startToken.print(out, false, false);

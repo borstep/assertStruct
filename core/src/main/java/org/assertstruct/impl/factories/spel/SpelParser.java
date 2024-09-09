@@ -8,6 +8,7 @@ import org.assertstruct.service.KeyParser;
 import org.assertstruct.service.NodeParser;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
+import org.assertstruct.template.TemplateParser;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -34,7 +35,7 @@ public class SpelParser implements KeyParser, NodeParser {
     }
 
     @Override
-    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token) {
+    public TemplateNode parseNode(String value, TemplateKey templateKey, ExtToken token, TemplateParser templateParser) {
         Expression expression = parser.parseExpression(value.substring(PREFIX.length()));
         return new SpelNode(expression, templateKey, token, this);
     }

@@ -35,12 +35,16 @@ public class TestPojo {
 
     ValueObject value;
 
-    public TestPojo(Integer num, Map<String, TestPojo> children, List<TestPojo> elements, Map<String, String> others, ValueObject value) {
+    @Singular(ignoreNullCollections = true)
+    List<PolymorphBase> polymorphes;
+
+    public TestPojo(Integer num, Map<String, TestPojo> children, List<TestPojo> elements, Map<String, String> others, ValueObject value, List<PolymorphBase> polymorphes) {
         this.num = num;
         this.children = children == null || children.isEmpty() ? null : children;
         this.elements = elements==null || elements.isEmpty() ? null : elements;
         this.others = others;
         this.value = value;
+        this.polymorphes = polymorphes == null || polymorphes.isEmpty() ? null : polymorphes;
     }
 
     public TestPojo(int num) {

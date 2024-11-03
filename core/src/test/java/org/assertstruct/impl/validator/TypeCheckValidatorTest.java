@@ -1,5 +1,7 @@
 package org.assertstruct.impl.validator;
 
+import data.PolymorphInt;
+import data.PolymorphString;
 import data.TestPojo;
 import data.ValueObject;
 import org.assertstruct.Res;
@@ -54,5 +56,16 @@ class TypeCheckValidatorTest {
     @Test
     void matchSourceTypeOK() {
         assertStruct("{ value:'str ::data.ValueObject' }", TestPojo.pojo().value(new ValueObject("str")).build());
+    }
+
+    @Test
+    void matchPolymorphicTypeOK() {
+        assertStruct("{polymorphes: [" +
+                "{ type: 'PolymorphString', str: 'str' }," +
+                "{ type: 'PolymorphInt', i: 1 }" +
+                "]}", TestPojo.pojo()
+                .polymorphe(new PolymorphString("str"))
+                .polymorphe(new PolymorphInt(1))
+                .build());
     }
 }

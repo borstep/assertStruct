@@ -1,9 +1,11 @@
 package org.assertstruct;
 
 import lombok.experimental.UtilityClass;
+import org.assertstruct.result.RootResult;
 import org.assertstruct.service.AssertStructConfigLoader;
 import org.assertstruct.service.AssertStructService;
 import org.assertstruct.service.Config;
+import org.assertstruct.template.Template;
 import org.opentest4j.AssertionFailedError;
 
 import static org.assertstruct.utils.ResourceUtils.*;
@@ -43,6 +45,14 @@ public class AssertStruct {
 
     public static Config.ConfigBuilder with() {
         return getDefault().with();
+    }
+
+    public static RootResult match(Res res, Object pojoActualValue) {
+        return getDefault().match(res, pojoActualValue);
+    }
+
+    public static RootResult match(Template template, Object pojoActualValue) {
+        return getDefault().match(template, pojoActualValue);
     }
 
     /**

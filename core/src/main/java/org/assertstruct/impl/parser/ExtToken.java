@@ -32,10 +32,12 @@ public class ExtToken {
      */
     private int suffix = -1;
     private boolean comaIncluded;
+    private int leadingSpaces = 0;
     private int indent = 0;
     private JsonToken type;
     private Object value;
     private char quoteChar = 0;
+    private boolean fromNewLine = false;
 
     public ExtToken(char[] source, int start, int end, JsonToken type, Object value, JsonLocation location) {
         this._source = source;
@@ -47,20 +49,29 @@ public class ExtToken {
         this.location = location;
     }
 
-    private int calcIndent() {
+    private void calcSpaces() {
+        for (int i = prefix; i < start; i++) {
+            if (_source[i] == ' ') {
+                leadingSpaces++;
+            } else {
+                break;
+            }
+        }
+        indent = start - prefix;
         for (int i = start - 1; i >= prefix; i--) {
             if (_source[i] == '\n') {
                 indent = start - i - 1;
                 break;
             }
         }
-        indent = start - prefix;
-        return indent;
+        if (prefix == 0 || _source[prefix - 1] == '\n') {
+            fromNewLine = true;
+        }
     }
 
     public void setSuffix(int suffix) {
         this.suffix = suffix;
-        calcIndent();
+        calcSpaces();
     }
 
     public boolean isEOLIncluded() {

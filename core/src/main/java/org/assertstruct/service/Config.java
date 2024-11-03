@@ -79,6 +79,28 @@ public class Config {
     @Builder.Default
     private int nowPrecision = 60;
 
+    /**
+     * Inline contains, print containers in one line
+     */
+    @Builder.Default
+    boolean inlineContainers=false;
+    /**
+     * Force trailing comma
+     */
+    @Builder.Default
+    boolean trailingComa=false;
+    /**
+     * Number of spaces before first element in single line structures
+     */
+    @Builder.Default
+    private int firstInlineElementIndent = 0;
+    /**
+     * Number of spaces between elements in single line structures
+     */
+    @Builder.Default
+    int inlineElementsSeparator=1;
+
+
     public static class ConfigBuilder {
         ConfigBuilder() {
             // Set some defaults

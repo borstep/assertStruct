@@ -43,7 +43,7 @@ Actual   :[1,2,3]
 And when you will click to see difference you will get:<br>
 ![Inline diff](./docs/media/inline.png)
 
-For more complex objects it's even more fascinating. In combination with *Console File Caddy* 
+For more complex objects it's even more fascinating. In combination with [**Console File Caddy**](https://plugins.jetbrains.com/plugin/21513-console-file-caddy) 
 Diff row will be transformed to a link which open diff editor for pojo.json5 file.
 ![Inline diff](./docs/media/pojo.png)
 

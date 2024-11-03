@@ -6,6 +6,7 @@ import org.assertstruct.converter.Wrapper;
 import org.assertstruct.impl.parser.ExtToken;
 import org.assertstruct.service.AssertStructService;
 import org.assertstruct.service.Config;
+import org.assertstruct.template.StructTemplateNode;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 import org.assertstruct.template.node.ArrayNode;
@@ -45,100 +46,168 @@ public class Json5Printer {
     }
 
     public String print(Object value) {
-        print(value, false, false, 0, true);
+        print(value, rootOpts());
         return out.toString();
     }
 
-    private void print(Object value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
+    private PrintOptions rootOpts() {
+        PrintOptions opts = new PrintOptions();
+        opts.first = true;
+        opts.last = true;
+        opts.fromNewLine = true;
+        opts.trailingEOL = false;
+        opts.indent = 0;
+        opts.trailingComma = config.isTrailingComa();
+        opts.firstInlineIndent = config.getFirstInlineElementIndent();
+        opts.inlineSeparator = config.getInlineElementsSeparator();
+        return opts;
+    }
+
+    private PrintOptions buildChildPrintOptions(PrintOptions pOpt, StructTemplateNode matchedTo, boolean isDict) {
+        PrintOptions opt = new PrintOptions();
+        opt.first = true;
+        opt.fromNewLine = !config.isInlineContainers();
+        opt.trailingEOL = !config.isInlineContainers();
+        opt.indent = pOpt.indent + config.getIndent();
+        opt.trailingComma = config.isTrailingComa();
+        opt.firstInlineIndent = config.getFirstInlineElementIndent();
+        opt.inlineSeparator = config.getInlineElementsSeparator();
+        opt.field = isDict;
+        if (matchedTo != null) {
+            opt.fromNewLine = !matchedTo.isInline();
+            opt.trailingEOL = !matchedTo.isInline();
+            if (matchedTo.getFirstInlineElementIndent() != null) {
+                opt.firstInlineIndent = matchedTo.getFirstInlineElementIndent();
+            }
+            if (matchedTo.getInlineElementsSeparator() != null) {
+                opt.inlineSeparator = matchedTo.getInlineElementsSeparator();
+            }
+            if (matchedTo.getDefaultIndent() != null) {
+                opt.indent = matchedTo.getDefaultIndent();
+            }
+            if (matchedTo.getTrailingComa() != null) {
+                opt.trailingComma = matchedTo.getTrailingComa();
+            }
+        }
+        return opt;
+    }
+
+    private void print(Object value, PrintOptions opts) {
         if (value instanceof Wrapper) {
             value = ((Wrapper) value).getValue();
         }
         if (value instanceof RootResult) {
-            value=((RootResult) value).getDelegate();
+            value = ((RootResult) value).getDelegate();
+        }
+        if (value instanceof ErrorValue) {
+            ErrorValue errorValue = (ErrorValue) value;
+            if (errorValue.getSource() instanceof Map || errorValue.getSource() instanceof Collection) { // if Map or collection matched by single match
+                value = errorValue.getSource(); // TODO think what to do with errorValue.getMatchedTo() in this case;
+            }
         }
         if (value instanceof TemplateNode) {
-            ((TemplateNode) value).print(out, trailingComma, trailingEOL, indent, fromNewLine);
+            printTemplateNode((TemplateNode) value, opts);
         } else if (value instanceof Map) {
-            printDict((Map) value, trailingComma, trailingEOL, indent, fromNewLine);
+            printDict((Map) value, opts);
         } else if (value instanceof Collection<?>) {
-            printList((Collection) value, trailingComma, trailingEOL, indent, fromNewLine);
+            printList((Collection) value, opts);
         } else {
-            printValue(value, trailingComma, trailingEOL, indent, fromNewLine);
+            printValue(value, opts);
         }
     }
 
-    private void printDict(Map<?,?> value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
+    private void printTemplateNode(TemplateNode value, PrintOptions opts) {
+        ExtToken startToken = value.getStartToken();
+        ExtToken endToken = value.getEndToken();
+        if (startToken != endToken) {
+            startToken.print(out, false, false);
+            out.append(startToken.get_source(), startToken.getSuffix() + 1, endToken.getPrefix() - startToken.getSuffix() - 1);
+            endToken.print(out, opts.forceComa(), opts.trailingEOL);
+        } else {
+            endToken.print(out, opts.forceComa(), opts.trailingEOL);
+        }
+    }
+
+
+    //    private void printDict(Map<?,?> value, boolean trailingComma, boolean trailingEOL, int indent, boolean inline) {
+    private void printDict(Map<?, ?> value, PrintOptions opts) {
         ObjectNode matchedTo = null;
         if (value instanceof ErrorMap) {
             matchedTo = ((ErrorMap) value).getMatchedTo();
         }
-        printStart(fromNewLine ? indent : 0, matchedTo, value.isEmpty() && config.isEmptyDictOnSameLine() ? "{" : "{\n");
-        boolean childEOL = true;
-        int childIndent = indent + config.getIndent();
+        printStart(opts, matchedTo, value.isEmpty() && config.isEmptyDictOnSameLine() ? "{" : config.isInlineContainers() ? "{" : "{\n");
         if (!value.isEmpty()) {
-
+            PrintOptions cOpts = buildChildPrintOptions(opts, matchedTo, true);
             Iterator<? extends Map.Entry<?, ?>> it = value.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<?, ?> child = it.next();
+                cOpts.last = !it.hasNext();
                 Object childKey = child.getKey();
                 Object childValue = child.getValue();
-                if (childKey instanceof TemplateKey) {
-                    ExtToken childKeyToken = ((TemplateKey) childKey).getToken();
-                    childIndent = childKeyToken.getIndent();
-                    childKeyToken.print(out, false, false);
-                } else {
-                    indent(childIndent);
-                    appendKey(childKey);
-                    out.append(": ");
-                }
-                if (childValue instanceof MatchResult) {
-                    TemplateNode matchedValueNode = ((MatchResult) childValue).getMatchedTo();
-                    if (matchedValueNode != null) {
-                        childEOL = matchedValueNode.getEndToken().isEOLIncluded();
-                    }
-                }
-                print(childValue, it.hasNext(), childEOL, childIndent, false);
+                printFieldName(cOpts, childKey);
+                print(childValue, cOpts);
+                calcNextPrintOpts(cOpts, childKey, childValue);
             }
         }
-        printEnd(trailingComma, trailingEOL, matchedTo, indent, "}");
+        printEnd(opts, matchedTo, "}");
     }
 
     private int appendKey(Object childKey) { //TODO optimize performance
         return Json5Encoder.encodeKey(childKey, out, config.getQuote(), config.isForceKeyQuoting());
     }
 
-    private void printList(Collection value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
+    //    private void printList(Collection value, boolean trailingComma, boolean trailingEOL, int indent, boolean inline) {
+    private void printList(Collection value, PrintOptions opts) {
         ArrayNode matchedTo = null;
         if (value instanceof ErrorList) {
             matchedTo = ((ErrorList) value).getMatchedTo();
         }
-        printStart(fromNewLine ? indent : 0, matchedTo, value.isEmpty() && config.isEmptyListOnSameLine() ? "[" : "[\n");
-        boolean childEOL = true;
-        int childIndent = indent + config.getIndent();
-        if (!value.isEmpty()) {
-            Iterator it = value.iterator();
-            while (it.hasNext()) {
-                Object childValue = it.next();
-                if (childValue instanceof MatchResult) {
-                    TemplateNode matchedValueNode = ((MatchResult) childValue).getMatchedTo();
-                    if (matchedValueNode != null) {
-                        childEOL = matchedValueNode.getEndToken().isEOLIncluded();
-                        childIndent = matchedValueNode.getEndToken().getIndent();
-                    }
+        if (matchedTo == null && config.isEmptyListOnSameLine() && value.isEmpty()) {
+            printStart(opts, null, null);
+            out.append("[]");
+            printEnd(opts, null, null);
+        } else {
+            printStart(opts, matchedTo, config.isInlineContainers() ? "[" : "[\n");
+            if (!value.isEmpty()) {
+                PrintOptions cOpts = buildChildPrintOptions(opts, matchedTo, false);
+                Iterator<?> it = value.iterator();
+                while (it.hasNext()) {
+                    Object childValue = it.next();
+                    cOpts.last = !it.hasNext();
+                    print(childValue, cOpts);
+                    calcNextPrintOpts(cOpts, null, childValue);
                 }
-                print(childValue, it.hasNext(), childEOL, childIndent, true);
             }
+            printEnd(opts, matchedTo, "]");
         }
-        printEnd(trailingComma, trailingEOL, matchedTo, indent, "]");
     }
 
-    private void printValue(Object value, boolean trailingComma, boolean trailingEOL, int indent, boolean fromNewLine) {
+    private void calcNextPrintOpts(PrintOptions cOpts, Object childKey, Object childValue) {
+        ExtToken startToken = childKey instanceof TemplateKey ? ((TemplateKey) childKey).getToken() : childValue instanceof TemplateNode ? ((TemplateNode) childValue).getVeryStartToken() : null;
+        if (startToken != null) {
+            if (startToken.isFromNewLine()) {
+                cOpts.indent = startToken.getIndent();
+            } else {
+                if (!cOpts.first) // skip inlineSeparator calculation for first element
+                    cOpts.inlineSeparator = startToken.getLeadingSpaces();
+            }
+
+        }
+        cOpts.fromNewLine = cOpts.trailingEOL; // if previous element has EOL
+        if (childValue instanceof MatchResult && ((MatchResult) childValue).getMatchedTo() != null) {
+            TemplateNode matchedValueNode = ((MatchResult) childValue).getMatchedTo();
+            cOpts.trailingEOL = matchedValueNode.getEndToken().isEOLIncluded();
+        }
+        cOpts.first = false;
+    }
+
+    private void printValue(Object value, PrintOptions opts) {
         TemplateNode matchedTo = null;
         if (value instanceof ErrorValue) {
             matchedTo = ((ErrorValue) value).getMatchedTo();
             value = ((ErrorValue) value).getSource();
         }
-        printStart(fromNewLine ? indent : 0, matchedTo, null);
+        printStart(opts, matchedTo, null);
         if (!isJsonType(value)) {
             value = Wrapper.unwrap(env.getJsonConverter().pojo2json(value));
         }
@@ -146,12 +215,12 @@ public class Json5Printer {
             appendStringValue((String) value, matchedTo);
         } else if (value instanceof Boolean || value instanceof Number || value == null) {
             out.append(value);
-        } else if (value instanceof Collection<?> || value instanceof Map) {
-            print(value, false, false, indent, false);
+        } else if (value instanceof Collection<?> || value instanceof Map || value instanceof Wrapper) {
+            throw new IllegalArgumentException("Print value must be used for simple types only. Wrong type: " + value.getClass().getName());
         } else {
             appendStringValue(value.toString(), matchedTo);
         }
-        printEnd(trailingComma, trailingEOL, matchedTo, indent, null);
+        printEnd(opts, matchedTo, null);
     }
 
     private void appendStringValue(String value, TemplateNode matchedTo) { //TODO optimize performance avoiding string manipulation
@@ -166,29 +235,52 @@ public class Json5Printer {
         out.append(quote);
     }
 
-    private void printStart(int indent, TemplateNode matchedTo, String startValue) {
+    private void printFieldName(PrintOptions opts, Object childKey) {
+        if (childKey instanceof TemplateKey) {
+            ExtToken childKeyToken = ((TemplateKey) childKey).getToken();
+            childKeyToken.print(out, false, false);
+        } else {
+            if (opts.fromNewLine) {
+                indent(opts.indent);
+            } else {
+                indent(opts.first ? opts.firstInlineIndent : opts.inlineSeparator);
+            }
+            appendKey(childKey);
+            out.append(": ");
+        }
+    }
+
+    private void printStart(PrintOptions opts, TemplateNode matchedTo, String startValue) {
         if (matchedTo != null) {
             matchedTo.printStart(out);
         } else {
-            indent(indent);
+            if (!opts.field) {
+                if (opts.fromNewLine) {
+                    indent(opts.indent);
+                } else {
+                    indent(opts.first ? opts.firstInlineIndent : opts.inlineSeparator);
+                }
+            }
             if (startValue != null) {
                 out.append(startValue);
             }
         }
     }
 
-    private void printEnd(boolean trailingComma, boolean trailingEOL, TemplateNode matchedTo, int indent, String endValue) {
+    private void printEnd(PrintOptions opts, TemplateNode matchedTo, String endValue) {
         if (matchedTo != null) {
-            matchedTo.printEnd(out, trailingComma, trailingEOL);
+            matchedTo.printEnd(out, opts.forceComa(), opts.trailingEOL);
         } else {
             if (endValue != null) {
-                indent(indent);
+                if (opts.fromNewLine) {
+                    indent(opts.indent);
+                }
                 out.append(endValue);
             }
-            if (trailingComma) {
+            if (opts.forceComa()) {
                 out.append(',');
             }
-            if (trailingEOL) {
+            if (opts.trailingEOL) {
                 out.append('\n');
             }
         }
@@ -202,5 +294,52 @@ public class Json5Printer {
     @Override
     public String toString() {
         return out.toString();
+    }
+
+    static class PrintOptions {
+        // Container level
+        /**
+         * print comma after last element
+         */
+        boolean trailingComma;
+        /**
+         * Container is object, print field value
+         */
+        boolean field;
+        /**
+         * number of spaces to indent as first element in container without new line
+         */
+        public int firstInlineIndent;
+
+        // Calculated based in position
+        /**
+         * First element in container
+         */
+        public boolean first;
+        /**
+         * last element in container
+         */
+        public boolean last;
+        // Calculated based in previous element
+        /**
+         * previous element ended with new line
+         */
+        public boolean fromNewLine;
+        /**
+         * number of spaces to indent between elements in container without new line
+         */
+        public int inlineSeparator;
+        /**
+         * Print new line at the end
+         */
+        boolean trailingEOL;
+        /**
+         * number of space to indent if printing on new line
+         */
+        int indent;
+
+        boolean forceComa() {
+            return trailingComma || !last;
+        }
     }
 }

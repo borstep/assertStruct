@@ -17,14 +17,14 @@ import java.util.Map;
 public class ObjectNode extends LinkedHashMap<String, TemplateNode> implements StructTemplateNode, DataNode<Map<String, Object>> {
 
     @Delegate
-    StructuredTemplateNodeShared shared;
+    StructuredTemplateNodeSharedImpl shared;
 
     Map<String, TemplateNode> simpleNodes = new HashMap<>();
     Map<String, TemplateNode> matchedNodes = new HashMap<>();
 
     public ObjectNode(TemplateKey key, ExtToken startToken) {
         super();
-        this.shared = new StructuredTemplateNodeShared(key, startToken, this.values());
+        this.shared = new StructuredTemplateNodeSharedImpl(key, startToken, this.values());
     }
 
     @Override

@@ -14,14 +14,34 @@ class Json5PrinterTest {
     @Test
     void printSimpleMap() {
         Json5Printer printer = new Json5Printer();
-        String expected = "{\n  key: 'value'\n}";
+        String expected = "{\n" +
+                "  key: 'value'\n" +
+                "}";
         assertEquals(expected, printer.print(mapOf("key", "value")));
+    }
+
+    @Test
+    void printSimpleMapInline() {
+        Json5Printer printer = new Json5Printer(AssertStruct.getDefault().with().inlineContainers(true).configure());
+        String expected = "{key: 'value', key1: 'value1'}";
+        assertEquals(expected, printer.print(mapOf("key", "value", "key1", "value1")));
     }
 
     @Test
     void printSimpleArray() {
         Json5Printer printer = new Json5Printer();
-        String expected = "[\n  1,\n  'str',\n  true\n]";
+        String expected = "[\n" +
+                "  1,\n" +
+                "  'str',\n" +
+                "  true\n" +
+                "]";
+        assertEquals(expected, printer.print(listOf(1, "str", true)));
+    }
+
+    @Test
+    void printSimpleArrayInline() {
+        Json5Printer printer = new Json5Printer(AssertStruct.getDefault().with().inlineContainers(true).configure());
+        String expected = "[1, 'str', true]";
         assertEquals(expected, printer.print(listOf(1, "str", true)));
     }
 
@@ -68,11 +88,27 @@ class Json5PrinterTest {
     void print2LevelsErrorLevel1Result() {
         Json5Printer printer = new Json5Printer();
         Template template = TWO_LEVEL_TEMPLATE.asTemplate();
-        MatchResult match = AssertStruct.getDefault().match(template,
+        MatchResult match = AssertStruct.match(template,
                 mapOf("key", "wrong",
-                "arr", listOf(1),
-                "dict", mapOf("key", "value")
-        ));
+                        "arr", listOf(1),
+                        "dict", mapOf("key", "value")
+                ));
         assertEquals(TWO_LEVEL_MATCH, printer.print(match));
     }
+
+    @Test
+    void arraySingleLineWrongFirst() {
+        checkFail("[1, 2, 3]", "[0, 2, 3]", listOf(0, 2, 3));
+    }
+
+    @Test
+    void arraySingleLineMissingLast() {
+        checkFail("[1, 2, 3]", "[1, 2,]", listOf(1, 2));
+    }
+
+    @Test
+    void arraySingleLineMissingFirst() {
+        checkFail("[1, 2, 3, '$opt.ordered:false']", "[ 2, 3, '$opt.ordered:false']", listOf(2, 3));
+    }
+
 }

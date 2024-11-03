@@ -40,9 +40,21 @@ public interface TemplateNode extends MatchResult {
         }
     }
 
+    @Deprecated
     default void print(StringBuilder out, boolean forceComa, boolean forceEOL, int indent, boolean fromNewLine) {
         ExtToken token = getToken();
         token.print(out, forceComa, forceEOL);
+    }
+
+    /**
+     * Return start token of key if it is or start token of this node if it is not
+     * @return start token
+     */
+    default ExtToken getVeryStartToken() {
+        if (getKey() != null) {
+            return getKey().getToken();
+        }
+        return getStartToken();
     }
 
     default ExtToken getStartToken() {

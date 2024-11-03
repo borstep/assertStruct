@@ -13,11 +13,11 @@ import java.util.List;
 public class ArrayNode extends LinkedList<TemplateNode> implements StructTemplateNode, DataNode<List<Object>> {
 
     @Delegate
-    private final StructuredTemplateNodeShared shared;
+    private final StructuredTemplateNodeSharedImpl shared;
 
     public ArrayNode(TemplateKey key, ExtToken startToken) {
         super();
-        shared = new StructuredTemplateNodeShared(key, startToken, this);
+        shared = new StructuredTemplateNodeSharedImpl(key, startToken, this);
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.assertstruct.impl.validator.TypeCheckValidator;
 import org.assertstruct.opt.OptionsBuilder;
 import org.assertstruct.service.SharedValidator;
 import org.assertstruct.template.StructTemplateNode;
+import org.assertstruct.template.StructTemplateShared;
 import org.assertstruct.template.TemplateKey;
 import org.assertstruct.template.TemplateNode;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class StructuredTemplateNodeShared {
+public class StructuredTemplateNodeSharedImpl implements StructTemplateShared {
     @Getter
     final TemplateKey key;
     @Getter
@@ -33,17 +34,25 @@ public class StructuredTemplateNodeShared {
 
     @Getter
     NodeOptions config;
-    NodeOptions.NodeOptionsBuilder configBuilder;
+    private NodeOptions.NodeOptionsBuilder configBuilder;
 
     @Getter
     SubtreeOptions subtreeOptions;
-    @Getter
-    SubtreeOptions.SubtreeOptionsBuilder subtreeConfigBuilder;
-
-    Set<SharedValidator> _validators = null;
+    private SubtreeOptions.SubtreeOptionsBuilder subtreeConfigBuilder;
 
     @Getter
     Set<SharedValidator> validators = null;
+    Set<SharedValidator> _validators = null;
+
+    @Getter
+    Boolean trailingComa;
+    @Getter
+    Integer defaultIndent;
+    @Getter
+    Integer firstInlineElementIndent;
+    @Getter
+    Integer inlineElementsSeparator;
+
 
     public void addSharedValidator(TypeCheckValidator typeValidator) {
         if (_validators == null) {
@@ -87,11 +96,39 @@ public class StructuredTemplateNodeShared {
         config = configBuilder == null ?
                 NodeOptions.NodeOptionsBuilder.buildDefault(parentConfig, isDict) :
                 configBuilder.build(parentConfig, isDict);
+
+        TemplateNode first=null,second=null, last=null;
         for (TemplateNode child : children) {
+            if (child.getStartToken()!=null) {
+                if (first == null) {
+                    first = child;
+                } else if (second == null){
+                    second = child;
+                }
+                last = child;
+            }
             if (child.isStruct()) {
                 ((StructTemplateNode) child).sealConfigs(parentConfig);
             }
         }
+        if (last!=null) {
+            trailingComa = last.getEndToken().isComaIncluded();
+        }
+        if (isInline()) {
+            if (first!=null)
+                firstInlineElementIndent = first.getVeryStartToken().getLeadingSpaces();
+            if (second!=null) {
+                inlineElementsSeparator = last.getVeryStartToken().getLeadingSpaces();
+            }
+        } else {
+            if (first!=null)
+                defaultIndent = first.getVeryStartToken().getIndent();
+        }
+    }
+
+    @Override
+    public boolean isInline() {
+        return getStartToken() != null && !getStartToken().isEOLIncluded();
     }
 
     private boolean isDict() {

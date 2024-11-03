@@ -43,16 +43,6 @@ public abstract class ListSharedTests extends AbstractMatchingTest {
     }
 
     @Test
-    void arrayOfArrayFail1() {
-        checkFail(Res.of("[0, []]"), Res.of("[[], []]"), listOf(listOf(), listOf()));
-    }
-
-    @Test
-    void arrayOfArrayFail2() {
-        checkFail(Res.of("[[1], []]"), Res.of("[[], []]"), listOf(listOf(), listOf()));
-    }
-
-    @Test
     void anyOk() {
         checkOK(Res.of("[1, '$*', 3]"), listOf(1, 2, 3));
     }

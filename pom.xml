@@ -34,8 +34,8 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git://github.com/borstep/assertStruct.git</connection>
-        <developerConnection>scm:git:ssh://github.com/borstep/assertStruct.git</developerConnection>
+        <connection>scm:git:https://github.com/borstep/assertStruct.git</connection>
+        <developerConnection>scm:git:git@github.com:borstep/assertStruct.git</developerConnection>
         <url>https://github.com/borstep/assertStruct/tree/main</url>
     </scm>
 

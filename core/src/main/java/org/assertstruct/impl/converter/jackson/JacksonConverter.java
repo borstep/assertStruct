@@ -2,6 +2,7 @@ package org.assertstruct.impl.converter.jackson;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -12,7 +13,6 @@ import org.assertstruct.service.exceptions.InitializationFailure;
 import org.assertstruct.service.exceptions.MatchingFailure;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ServiceLoader;
 
 @Slf4j
@@ -20,6 +20,7 @@ import java.util.ServiceLoader;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JacksonConverter implements JsonConverter {
     public static final String PROP_PREFIX="jackson.";
+    // custom date format supported removed because of thread safety issue
     public static final String PROP_DATE_FORMAT =PROP_PREFIX+"dateFormat";
     public static final String PROP_MODULES =PROP_PREFIX+"modules";
     ObjectMapper mapper;
@@ -48,8 +49,14 @@ public class JacksonConverter implements JsonConverter {
                 }
             }
         }
-        if (config.getExt().containsKey(PROP_DATE_FORMAT))
+        baseMapper.setDateFormat(new StdDateFormat());
+        // TODO add custom date format support
+/* support for custom date format removed because of thread safety issue
+// ext.jackson.dateFormat=yyyy-MM-dd'T'HH:mm:ss.SSSZ
+        if (config.getExt().containsKey(PROP_DATE_FORMAT)) {
             baseMapper.setDateFormat(new SimpleDateFormat(config.getExt().get(PROP_DATE_FORMAT)));
+        }
+*/
         return baseMapper;
     }
 

@@ -91,6 +91,7 @@
                     <releaseProfiles>release,sign</releaseProfiles>
                     <tagNameFormat>release/@{project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <pushChanges>false</pushChanges>
                 </configuration>
             </plugin>
         </plugins>

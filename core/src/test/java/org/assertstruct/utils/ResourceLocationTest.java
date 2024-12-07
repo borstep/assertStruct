@@ -3,6 +3,7 @@ package org.assertstruct.utils;
 import org.assertstruct.Res;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ResourceLocationTest {
@@ -12,13 +13,13 @@ class ResourceLocationTest {
     @Test
     void contentResourceLocationAt() {
         ResourceLocation location = CONTENT.getLocation();
-        assertEquals("at org.assertstruct.utils.ResourceLocationTest(ResourceLocationTest.java:9)", location.at());
+        assertEquals("at org.assertstruct.utils.ResourceLocationTest(ResourceLocationTest.java:10)", location.at());
     }
 
     @Test
     void fileResourceLocationAt() {
         ResourceLocation location = FILE.getLocation();
-        assertEquals("at /C:/Boris/PRJ/pet/assertstruct-core/core/target/test-classes/res/res.txt (res.txt:0)", location.at());
+        assertThat(location.at()).matches("at .+/assertstruct-core/core/target/test-classes/res/res\\.txt \\(res\\.txt:0\\)");
     }
 
     @Test

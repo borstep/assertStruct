@@ -26,11 +26,19 @@ public class AbstractMatchingTest {
         checkOK(Res.res(template), actualValue);
     }
 
+    public void checkOK(String template, Object actualValue, String message) {
+        checkOK(Res.res(template), actualValue, message);
+    }
+
     public void checkOK(Res res, Object actualValue) {
+        checkOK(res, actualValue, null);
+    }
+
+    public void checkOK(Res res, Object actualValue, String message) {
         Template template = parse(res);
         MatchResult match = env.match(template, actualValue);
-        assertEquals(template.asString(), env.jsonify(match));
-        assertFalse(match.hasDifference());
+        assertEquals(template.asString(), env.jsonify(match), message);
+        assertFalse(match.hasDifference(), message);
     }
 
     public Template parse(Res res) {

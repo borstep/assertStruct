@@ -27,6 +27,10 @@ public class TestUtils {
         env.checkOK(Res.res(template), actualValue);
     }
 
+    public static void checkOK(String template, Object actualValue, String message ) {
+        env.checkOK(Res.res(template), actualValue, message);
+    }
+
     public static void checkOK(Res res, Object actualValue) {
         env.checkOK(res, actualValue);
     }

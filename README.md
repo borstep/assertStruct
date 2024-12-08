@@ -343,7 +343,7 @@ will be loaded earlier, so higher priority will override.
 All properties with simple types from ```org.assertstruct.service.Config.ConfigBuilder``` can be used in *assert-struct.properties* file with prefix ```config.```.
 Any properties with prefix ```ext.``` can be added, and they are reserved as convenient way to set properties for extensions. 
 Default values are defined in core module [assert-struct.properties](./core/src/main/resources/assert-struct.properties) file.
-There is full list of [support properties](.docs/properties.md)
+There is full list of [support properties](docs/properties.md)
 
 
 ### SPI

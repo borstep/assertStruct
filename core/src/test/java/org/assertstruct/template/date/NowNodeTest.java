@@ -28,7 +28,6 @@ public class NowNodeTest {
     @Test
     void assert_Fail() {
         Instant notNow = Instant.now().minus(900, SECONDS);
-//        DateTimeFormatter dtf= DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSSX").withZone(ZoneOffset.UTC);
         checkFail("'$NOW'", "'" + notNow.toString()+"'", notNow);
     }
 

@@ -33,3 +33,5 @@ In `assert-struct.properties` file all this properties must be prefixed with `co
 | timeFormat                  | Add date format supported by $ANY_TIME                                                             |                                                                                                             |
 | timeFormatList              | Coma-separated list of formats supported by $ANY_TIME                                              | HH:mm:ss[.SSS],HH:mm:ss[.SSSSSSSSS]                                                                         |
 
+## Date formats
+It's possible to use any pattern supported by [java.time.format.DateTimeFormatter](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html) or static field name like `ISO_INSTANT`

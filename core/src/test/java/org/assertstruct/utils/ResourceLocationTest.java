@@ -19,7 +19,7 @@ class ResourceLocationTest {
     @Test
     void fileResourceLocationAt() {
         ResourceLocation location = FILE.getLocation();
-        assertThat(location.at()).matches("at .+/assertstruct-core/core/target/test-classes/res/res\\.txt \\(res\\.txt:0\\)");
+        assertThat(location.at()).matches("at .+/core/target/test-classes/res/res\\.txt \\(res\\.txt:0\\)");
     }
 
     @Test
